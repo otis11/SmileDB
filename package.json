@@ -1,0 +1,213 @@
+{
+    "name": "smiledb",
+    "displayName": "SmileDB",
+    "description": "A tool to interact with multiple database systems inside VSCode (:",
+    "version": "0.1.0",
+    "icon": "resources/logo.png",
+    "pricing": "Free",
+    "engines": {
+        "vscode": "^1.77.0"
+    },
+    "preview": true,
+    "categories": [
+        "Programming Languages",
+        "Data Science"
+    ],
+    "bugs": {
+        "url": "https://github.com/eat4/SmileDB/issues"
+    },
+    "keywords": [
+        "Redis",
+        "MySQL",
+        "MongoDB",
+        "Database",
+        "SmileDB"
+    ],
+    "publisher": "eat4",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/eat4/SmileDB"
+    },
+    "activationEvents": [],
+    "main": "./dist/extension.js",
+    "scripts": {
+        "vscode:prepublish": "npm run esbuild-base -- --minify",
+        "esbuild-base": "node esbuild.js",
+        "esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+        "test-compile": "tsc -p ./",
+        "lint": "eslint src --fix --ext ts,js",
+        "rebuild": " ./node_modules/.bin/electron-rebuild -v \"22.3.14\""
+    },
+    "contributes": {
+        "menus": {
+            "view/title": [
+                {
+                    "command": "SmileDB.refreshConnections",
+                    "when": "view == SmileDB",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "SmileDB.newConnection",
+                    "when": "view == SmileDB",
+                    "group": "navigation@2"
+                },
+                {
+                    "command": "SmileDB.help",
+                    "when": "view == SmileDB",
+                    "group": "navigation@3"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "SmileDB.editConnection",
+                    "when": "view == SmileDB && viewItem == PoolConnectionItem"
+                },
+                {
+                    "command": "SmileDB.deleteConnection",
+                    "when": "view == SmileDB && viewItem == PoolConnectionItem"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "SmileDB",
+                    "title": "Connections",
+                    "icon": "resources/logo.png"
+                }
+            ]
+        },
+        "views": {
+            "SmileDB": [
+                {
+                    "id": "SmileDB",
+                    "name": "SmileDB"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "SmileDB.editConnection",
+                "category": "SmileDB",
+                "title": "Edit Connection",
+                "icon": "$(edit)"
+            },
+            {
+                "command": "SmileDB.newConnection",
+                "category": "SmileDB",
+                "title": "New Connection",
+                "icon": "$(add)"
+            },
+            {
+                "command": "SmileDB.deleteConnection",
+                "category": "SmileDB",
+                "title": "Delete Connection",
+                "icon": "$(trash)"
+            },
+            {
+                "command": "SmileDB.refreshConnections",
+                "category": "SmileDB",
+                "title": "Refresh Connections",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "SmileDB.refreshConnectionsSilent",
+                "category": "SmileDB",
+                "title": "Refresh Connections Silent",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "SmileDB.resetConnectionStorage",
+                "title": "Reset Connections",
+                "category": "SmileDB",
+                "icon": "$(trash)"
+            },
+            {
+                "command": "SmileDB.openTable",
+                "category": "SmileDB",
+                "icon": "$(table)",
+                "title": "Open Table"
+            },
+            {
+                "command": "SmileDB.openActiveConnections",
+                "category": "SmileDB",
+                "icon": "$(layers-active)",
+                "title": "Open Active Database Connections"
+            },
+            {
+                "command": "SmileDB.help",
+                "category": "SmileDB",
+                "icon": "$(question)",
+                "title": "Help"
+            }
+        ],
+        "configuration": {
+            "title": "SmileDB",
+            "properties": {
+                "SmileDB.general.messageDisplay": {
+                    "default": "Status Bar",
+                    "type": "string",
+                    "enum": [
+                        "Information Message",
+                        "Status Bar"
+                    ],
+                    "description": "How some feedback messages of this extension should be displayed. (for example successful table updates)"
+                },
+                "SmileDB.table.pageResultsLimit": {
+                    "default": 100,
+                    "type": "integer",
+                    "description": "How many rows should be rendered per page by default. This setting can be adjusted in the table view directly as well."
+                },
+                "SmileDB.table.pageResultsLimitOptions": {
+                    "default": [
+                        200,
+                        500,
+                        1000,
+                        5000,
+                        10000
+                    ],
+                    "type": "array",
+                    "description": "Options available for rows per page inside the table view. (default can be set via SmileDB.table.pageResultsLimit)"
+                },
+                "SmileDB.table.defaultEditMode": {
+                    "default": "Select",
+                    "type": "string",
+                    "enum": [
+                        "Select",
+                        "Edit"
+                    ],
+                    "description": "Select Mode lets you select multiple columns/rows and interact with them (for example delete multiple selected rows). Via double clicking on a field you can edit it. Edit Mode lets you edit each field directly."
+                }
+            }
+        }
+    },
+    "devDependencies": {
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/mssql": "^9.1.0",
+        "@types/node": "^16.18.26",
+        "@types/pg": "^8.10.2",
+        "@types/vscode": "^1.77.0",
+        "@typescript-eslint/eslint-plugin": "^5.59.1",
+        "@typescript-eslint/parser": "^5.59.1",
+        "@vscode/codicons": "^0.0.33",
+        "@vscode/test-electron": "^2.3.0",
+        "electron-rebuild": "^3.2.9",
+        "esbuild": "^0.16.10",
+        "esbuild-plugin-copy": "^2.0.1",
+        "eslint": "^8.39.0",
+        "glob": "^8.1.0",
+        "mocha": "^10.2.0",
+        "typescript": "^5.0.4"
+    },
+    "dependencies": {
+        "@vscode/webview-ui-toolkit": "^1.2.2",
+        "ioredis": "^5.3.2",
+        "mongodb": "^5.8.0",
+        "mssql": "^10.0.1",
+        "mysql2": "^3.3.0",
+        "pg": "^8.11.0",
+        "vscode-languageclient": "^9.0.1"
+    }
+}

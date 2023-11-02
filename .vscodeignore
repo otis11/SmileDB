@@ -1,0 +1,7 @@
+.vscode
+node_modules
+src/
+tsconfig.json
+webpack.config.js
+!node_modules/@vscode/codicons/dist/codicon.css
+!node_modules/@vscode/codicons/dist/codicon.ttf
