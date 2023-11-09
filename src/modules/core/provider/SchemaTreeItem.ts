@@ -8,6 +8,7 @@ export class SchemaTreeItem extends TreeItem {
         public connectionConfig: PoolConnectionConfig,
     ) {
         super(connectionConfig.connection.schema || '', TreeItemCollapsibleState.Collapsed);
+        this.contextValue = 'schema';
         this.iconPath = getIconDarkLightPaths(extensionUri, 'schema.svg');
     }
 }

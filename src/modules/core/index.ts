@@ -91,6 +91,13 @@ export const coreModule: Module = {
         registerCommand('SmileDB.help', context, () => {
             renderHelpApp(context.extensionUri, extensionStorage);
         });
+        registerCommand('SmileDB.copyTreeItemLabel', context, (treeItem) => {
+            if (treeItem instanceof vscode.TreeItem) {
+                vscode.env.clipboard.writeText(treeItem.label?.toString() || '');
+            } else {
+                vscode.window.showInformationMessage('Only available by right clicking on a tree item.');
+            }
+        });
     }
 };
 

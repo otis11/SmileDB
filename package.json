@@ -61,11 +61,18 @@
             "view/item/context": [
                 {
                     "command": "SmileDB.editConnection",
-                    "when": "view == SmileDB && viewItem == PoolConnectionItem"
+                    "when": "view == SmileDB && viewItem == connection",
+                    "group": "connection@1"
                 },
                 {
                     "command": "SmileDB.deleteConnection",
-                    "when": "view == SmileDB && viewItem == PoolConnectionItem"
+                    "when": "view == SmileDB && viewItem == connection",
+                    "group": "connection@2"
+                },
+                {
+                    "command": "SmileDB.copyTreeItemLabel",
+                    "when": "view == SmileDB && viewItem =~ /^(connection|database|schema|table)$/",
+                    "group": "util@1"
                 }
             ]
         },
@@ -140,6 +147,11 @@
                 "category": "SmileDB",
                 "icon": "$(question)",
                 "title": "Help"
+            },
+            {
+                "command": "SmileDB.copyTreeItemLabel",
+                "category": "SmileDB",
+                "title": "Copy Label"
             }
         ],
         "configuration": {

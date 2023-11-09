@@ -10,8 +10,7 @@ export class PoolConnectionTreeItem extends TreeItem {
         super(connectionConfig.name, TreeItemCollapsibleState.Collapsed);
         this.tooltip = `${connectionConfig.connection.host} ${connectionConfig.connection.port}`;
         this.description = connectionConfig.connection.port?.toString();
-        this.contextValue = "PoolConnectionItem";
-
+        this.contextValue = "connection";
 
         let icon: string = '';
         if (isPoolConnectionConfigActive(connectionConfig)) {

@@ -8,6 +8,7 @@ export class DatabaseTreeItem extends TreeItem {
         public connectionConfig: PoolConnectionConfig
     ) {
         super(connectionConfig.connection.database || '', TreeItemCollapsibleState.Collapsed);
+        this.contextValue = "database";
         this.iconPath = getIconDarkLightPaths(extensionUri, 'database.svg');
     }
 }
