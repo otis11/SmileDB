@@ -215,7 +215,8 @@ vscode-text-field {
 #selection-mode,
 #delete-rows,
 #push-changes-preview,
-#settings {
+#settings,
+#export-data {
     display: flex;
     margin: 0 4px;
     align-items: center;
@@ -488,4 +489,36 @@ vscode-text-field {
 
 #popup-content pre {
     padding-bottom: 12px;
+}
+
+.flex-row {
+    display: flex;
+    padding: 4px 0;
+    align-items: center;
+}
+
+vscode-divider {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+vscode-text-area {
+    width: 100%;
+}
+
+vscode-radio {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.ml-3 {
+    margin-left: 12px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+#export-copy-to-clipboard {
+    margin-left: auto;
 }

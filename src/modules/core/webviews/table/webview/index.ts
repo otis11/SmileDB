@@ -1,3 +1,4 @@
+import { provideVSCodeDesignSystem, vsCodeButton, vsCodeCheckbox, vsCodeDivider, vsCodeDropdown, vsCodeOption, vsCodeRadio, vsCodeRadioGroup, vsCodeTextArea, vsCodeTextField } from "@vscode/webview-ui-toolkit";
 import { onConfigLoad } from "../../webview-helper/config";
 import { onConnectionConfigLoad } from "../../webview-helper/connectionConfig";
 import { registerShortcuts } from "../../webview-helper/registerShortcuts";
@@ -10,10 +11,24 @@ import { setLoading } from "./loading";
 import { setTableRowsOriginal } from "./orderBy";
 import { renderPagination, renderPaginationSelect, setPageResultsLimit, updatePagination } from "./pagination";
 import "./popup";
+import "./exportData";
 import { onPushChangesClick, renderPushChanges, updateOnPushChangesState, updatePushChangesLoadingState } from "./push";
 import { getQueryResult, openQueriesPreview, requestExecuteQueryFetch, setQueryResult, setQueryResultChanges, setQueryResultDeletions, setQueryResultInsertions, setQueryResultTimeInMilliseconds, updateQueryTimeInMilliseconds } from "./query";
 import { renderTable, renderTableResult } from "./table";
 import { renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode";
+import { updateExportDataFolderLocation } from "./exportData";
+
+provideVSCodeDesignSystem().register(
+    vsCodeButton(),
+    vsCodeCheckbox(),
+    vsCodeDivider(),
+    vsCodeOption(),
+    vsCodeDropdown(),
+    vsCodeTextArea(),
+    vsCodeTextField(),
+    vsCodeRadio(),
+    vsCodeRadioGroup()
+);
 
 let reloadElement: HTMLElement | null;
 
@@ -80,6 +95,10 @@ window.addEventListener('message', event => {
         setQueryResult(message.payload);
         updatePagination(getQueryResult()?.stats.rowCount || 0);
         renderTableResult();
+    }
+
+    if (message.command === 'export.chooseLocation.result') {
+        updateExportDataFolderLocation(message.payload);
     }
 
     updateOnPushChangesState();

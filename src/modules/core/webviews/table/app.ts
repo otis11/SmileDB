@@ -1,7 +1,7 @@
-import { Uri, commands } from "vscode";
+import { Uri, commands, window } from "vscode";
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
 import { config } from "../../../../config";
-import { getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common";
+import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common";
 import { PoolConnectionConfig } from "../../types";
 
 export function renderTableApp(
@@ -131,6 +131,22 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
     if (command === "workbench.action.openSettings") {
         commands.executeCommand(command, payload);
     }
+
+    if (command === "export.chooseLocation") {
+        const files = await window.showOpenDialog({
+            title: 'Select a file',
+            canSelectMany: false,
+            canSelectFolders: true,
+            canSelectFiles: false,
+        });
+
+        const file = files ? files[0] : null;
+        app.panel?.webview.postMessage({ command: `export.chooseLocation.result`, payload: file?.path });
+    }
+
+    if (command === "copy.toClipboard") {
+        copyToClipboard(message.payload);
+    }
 }
 
 function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
@@ -161,6 +177,9 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
 
                 <div class="vertical-divider"></div>
                 <div id="selection-mode" title="Switch between Selection and Edit Mode [Ctrl + s]"><i class="codicon codicon-inspect"></i></div>
+
+                <div class="vertical-divider"></div>
+                <div id="export-data" title="Export data to a file or clipboard"><i class="codicon codicon-export"></i></div>
 
                 <div class="vertical-divider"></div>
                 <div class="spacer"></div>

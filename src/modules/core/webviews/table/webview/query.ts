@@ -4,6 +4,7 @@ import { getFilterDatabaseString } from "./filter";
 import { setLoading } from "./loading";
 import { getOrderByConfig } from "./orderBy";
 import { getPage, getPageResultsLimit } from "./pagination";
+import { openPopup } from "./popup";
 import { getTableElement } from "./table";
 
 const queryTimeInMillisecondsElement = document.getElementById('query-time-in-milliseconds');
@@ -284,18 +285,13 @@ export function requestExecuteQuery(rawQuery: string) {
 }
 
 export function openQueriesPreview(payload: any) {
-    const popupElement = document.getElementById('popup');
-    const popupElementContent = document.getElementById('popup-content');
-    if (popupElementContent) {
-        popupElementContent.innerHTML = `
+    openPopup(`
+            <h2>Query Preview</h2>
             ${createQueryPreviewElement('Insert', payload.queriesInsert)}
             ${createQueryPreviewElement('Delete', payload.queriesDelete)}
             ${createQueryPreviewElement('Update', payload.queriesUpdate)}
             ${createQueryPreviewElement('Fetch', payload.queriesFetch)}
-        `;
-    };
-    popupElement?.classList.remove('d-none');
-    document.body.style.overflow = 'hidden';
+        `);
 }
 
 function createQueryPreviewElement(title: string, queries: string[]) {
