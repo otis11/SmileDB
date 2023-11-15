@@ -36,7 +36,7 @@ function openExportDataPopup() {
                 <vscode-radio-group id="export-which-data" orientation="vertical">
                     <label slot="label">Which Data</label>
                     <vscode-radio value="current" checked>Current (${data?.rows.length} rows, ${data?.fields.length} columns)</vscode-radio>
-                    <vscode-radio value="complete">Complete Database (${data?.stats.rowCount} rows, ${data?.fields.length}, columns)</vscode-radio>
+                    <vscode-radio value="complete">Complete Database ${data?.stats.rowCount ? '(' + data.stats.rowCount + ' rows)' : ''}</vscode-radio>
                 </vscode-radio-group>
             </div>
             <vscode-divider></vscode-divider>
@@ -180,6 +180,9 @@ function removeExportDataEventListeners() {
 function exportDataFormatCSV(data: QueryResult, addRowHeader: boolean, addColumnHeader: boolean, rowsCount: number) {
     let content = '';
     if (addRowHeader) {
+        if (addColumnHeader) {
+            content += 'row_number' + exportDataSeparator;
+        }
         content += data.fields.map(field => field.name).join(exportDataSeparator) + '\n';
     }
     for (let i = 0; i < rowsCount; i++) {
