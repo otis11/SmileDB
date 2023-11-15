@@ -1,6 +1,6 @@
 import { ExtensionContext } from 'vscode';
 import { Module, PoolConnectionConfig, QueryConfigBase } from './types';
-import { ExtensionStorage, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, getIconDarkLightPaths, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common';
+import { ExtensionStorage, copyToClipboard, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, getIconDarkLightPaths, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common';
 import { PoolConnectionTreeProvider, } from './provider';
 import * as vscode from 'vscode';
 import { renderEditConnectionApp } from './webviews/edit-connection/app';
@@ -93,7 +93,7 @@ export const coreModule: Module = {
         });
         registerCommand('SmileDB.copyTreeItemLabel', context, (treeItem) => {
             if (treeItem instanceof vscode.TreeItem) {
-                vscode.env.clipboard.writeText(treeItem.label?.toString() || '');
+                copyToClipboard(treeItem.label?.toString() || '');
             } else {
                 vscode.window.showInformationMessage('Only available by right clicking on a tree item.');
             }

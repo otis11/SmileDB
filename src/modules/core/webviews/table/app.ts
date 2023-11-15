@@ -1,8 +1,9 @@
-import { Uri, commands } from "vscode";
+import { Uri, commands, window, workspace } from "vscode";
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
 import { config } from "../../../../config";
-import { getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common";
+import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common";
 import { PoolConnectionConfig } from "../../types";
+import { writeFileSync } from "fs";
 
 export function renderTableApp(
     extensionUri: Uri,
@@ -131,6 +132,47 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
     if (command === "workbench.action.openSettings") {
         commands.executeCommand(command, payload);
     }
+
+    if (command === "export.chooseLocation") {
+        const files = await window.showOpenDialog({
+            title: 'Select a file',
+            canSelectMany: false,
+            canSelectFolders: true,
+            canSelectFiles: false,
+        });
+
+        const path = files ? files[0].path : null;
+        app.panel?.webview.postMessage({ command: `export.chooseLocation.result`, payload: path });
+    }
+
+    if (command === "copy.toClipboard") {
+        copyToClipboard(message.payload);
+    }
+
+    if (command === "export.save.toFile") {
+        try {
+            writeFileSync(message.payload.path, message.payload.data, 'utf-8');
+            workspace.openTextDocument(message.payload.path).then(doc => {
+                window.showTextDocument(doc);
+            });
+            app.panel?.webview.postMessage({ command: `export.save.toFile.result` });
+        } catch (e: any) {
+            app.panel?.webview.postMessage({ command: `export.save.toFile.error`, payload: e.message });
+        }
+    }
+
+    if (command === "export.load.completeDatabase") {
+        try {
+            const data = await connection.executeQueriesAndFetch([], {
+                ...queryConfig,
+                page: 0,
+                pageResultsLimit: 999999999,
+            });
+            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.result`, payload: data });
+        } catch (e: any) {
+            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.error`, payload: e.message });
+        }
+    }
 }
 
 function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
@@ -161,6 +203,9 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
 
                 <div class="vertical-divider"></div>
                 <div id="selection-mode" title="Switch between Selection and Edit Mode [Ctrl + s]"><i class="codicon codicon-inspect"></i></div>
+
+                <div class="vertical-divider"></div>
+                <div id="export-data" title="Export data to a file or clipboard"><i class="codicon codicon-export"></i></div>
 
                 <div class="vertical-divider"></div>
                 <div class="spacer"></div>
