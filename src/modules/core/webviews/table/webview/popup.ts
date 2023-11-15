@@ -1,10 +1,7 @@
 const popupElementClose = document.getElementById('popup-close');
 const popupElement = document.getElementById('popup');
 const popupElementContent = document.getElementById('popup-content');
-popupElementClose?.addEventListener('click', (e) => {
-    popupElement?.classList.add('d-none');
-    document.body.style.overflow = 'unset';
-});
+popupElementClose?.addEventListener('click', closePopup);
 
 export function openPopup(content: string) {
     if (popupElementContent && content) {
@@ -12,4 +9,9 @@ export function openPopup(content: string) {
         popupElement?.classList.remove('d-none');
         document.body.style.overflow = 'hidden';
     };
+}
+
+export function closePopup() {
+    popupElement?.classList.add('d-none');
+    document.body.style.overflow = 'unset';
 }

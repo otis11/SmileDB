@@ -16,7 +16,8 @@ import { onPushChangesClick, renderPushChanges, updateOnPushChangesState, update
 import { getQueryResult, openQueriesPreview, requestExecuteQueryFetch, setQueryResult, setQueryResultChanges, setQueryResultDeletions, setQueryResultInsertions, setQueryResultTimeInMilliseconds, updateQueryTimeInMilliseconds } from "./query";
 import { renderTable, renderTableResult } from "./table";
 import { renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode";
-import { updateExportDataFolderLocation } from "./exportData";
+import { setCompleteDatabaseExport, updateExportDataFolderLocation } from "./exportData";
+import { closePopup } from "./popup";
 
 provideVSCodeDesignSystem().register(
     vsCodeButton(),
@@ -99,6 +100,15 @@ window.addEventListener('message', event => {
 
     if (message.command === 'export.chooseLocation.result') {
         updateExportDataFolderLocation(message.payload);
+    }
+
+    if (message.command === 'export.load.completeDatabase.result') {
+        setCompleteDatabaseExport(message.payload);
+        setLoading(false);
+    }
+
+    if (message.command === 'export.save.toFile.result') {
+        closePopup();
     }
 
     updateOnPushChangesState();

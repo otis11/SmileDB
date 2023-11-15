@@ -1,8 +1,9 @@
-import { Uri, commands, window } from "vscode";
+import { Uri, commands, window, workspace } from "vscode";
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
 import { config } from "../../../../config";
 import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common";
 import { PoolConnectionConfig } from "../../types";
+import { writeFileSync } from "fs";
 
 export function renderTableApp(
     extensionUri: Uri,
@@ -140,12 +141,37 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
             canSelectFiles: false,
         });
 
-        const file = files ? files[0] : null;
-        app.panel?.webview.postMessage({ command: `export.chooseLocation.result`, payload: file?.path });
+        const path = files ? files[0].path : null;
+        app.panel?.webview.postMessage({ command: `export.chooseLocation.result`, payload: path });
     }
 
     if (command === "copy.toClipboard") {
         copyToClipboard(message.payload);
+    }
+
+    if (command === "export.save.toFile") {
+        try {
+            writeFileSync(message.payload.path, message.payload.data, 'utf-8');
+            workspace.openTextDocument(message.payload.path).then(doc => {
+                window.showTextDocument(doc);
+            });
+            app.panel?.webview.postMessage({ command: `export.save.toFile.result` });
+        } catch (e: any) {
+            app.panel?.webview.postMessage({ command: `export.save.toFile.error`, payload: e.message });
+        }
+    }
+
+    if (command === "export.load.completeDatabase") {
+        try {
+            const data = await connection.executeQueriesAndFetch([], {
+                ...queryConfig,
+                page: 0,
+                pageResultsLimit: 999999999,
+            });
+            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.result`, payload: data });
+        } catch (e: any) {
+            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.error`, payload: e.message });
+        }
     }
 }
 

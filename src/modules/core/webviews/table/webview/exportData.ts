@@ -4,8 +4,10 @@ import { openPopup } from "./popup";
 import { getQueryResult } from "./query";
 import { vscode } from "../../webview-helper/vscode";
 import { getConnectionConfig } from "../../webview-helper/connectionConfig";
+import { setLoading } from "./loading";
 
 type ExportDataFormat = 'CSV' | 'TXT';
+type ExportDataScope = 'current' | 'complete';
 const exportDataElement = document.getElementById('export-data');
 const updatePreviewChangeListenerIds = [
     'export-add-row-header',
@@ -18,6 +20,11 @@ const exportDataSeparatorDefaults: Record<ExportDataFormat, string> = {
     CSV: ',',
     TXT: '    ',
 };
+let completeDatabase: null | QueryResult = null;
+
+export function setCompleteDatabaseExport(data: QueryResult) {
+    completeDatabase = data;
+}
 
 exportDataElement?.addEventListener('click', openExportDataPopup);
 
@@ -64,7 +71,7 @@ function openExportDataPopup() {
             <vscode-divider></vscode-divider>
             <div class="flex-row">
                 <vscode-button id="export-copy-to-clipboard" appearance="secondary">Copy to Clipboard</vscode-button>
-                <vscode-button id="export-save-to-file" class="ml-3">Save to File</vscode-button>
+                <vscode-button id="export-save-to-file" class="ml-3" disabled>Save to File</vscode-button>
             </div>
         `);
     requestAnimationFrame(() => {
@@ -79,19 +86,27 @@ function updateExportDataPreview() {
     previewElement.value = createExportDataString(exportDataPreviewRowsCount);
 }
 
-export function updateExportDataFolderLocation(folderPath: string) {
-    const conn = getConnectionConfig();
-    const format = (document.getElementById('export-data-format') as HTMLInputElement).value.toLowerCase();
-    (document.getElementById('export-folder-path') as HTMLInputElement).value = folderPath + `/${conn?.connection.database}.${format}`;
+export function updateExportDataFolderLocation(folderPath: string | null) {
+    if (folderPath !== null) {
+        const conn = getConnectionConfig();
+        const format = (document.getElementById('export-data-format') as HTMLInputElement).value.toLowerCase();
+        (document.getElementById('export-folder-path') as HTMLInputElement).value = folderPath + `/${conn?.connection.database}.${format}`;
+        // @ts-ignore
+        document.getElementById('export-save-to-file').disabled = false;
+    }
 }
 
 function createExportDataString(rowCount: number) {
     const addRowHeader = (document.getElementById('export-add-row-header') as HTMLInputElement).checked;
     const addColumnHeader = (document.getElementById('export-add-column-header') as HTMLInputElement).checked;
     const exportDataFormat = (document.getElementById('export-data-format') as HTMLInputElement).value;
-    const data = getQueryResult();
+    const exportDataScope = (document.getElementById('export-which-data') as HTMLInputElement).value as ExportDataScope;
+    let data = getQueryResult();
     if (!data) {
         return '';
+    }
+    if (exportDataScope === 'complete') {
+        data = completeDatabase as QueryResult;
     }
 
     const maxRowCount = Math.min(rowCount, data.rows.length);
@@ -126,8 +141,28 @@ function addExportDataEventListeners() {
     document.getElementById('export-copy-to-clipboard')?.addEventListener('click', () => {
         vscode.postMessage({
             command: 'copy.toClipboard',
-            payload: createExportDataString(999999999)
+            payload: createExportDataString(Number.MAX_SAFE_INTEGER)
         });
+    });
+
+    document.getElementById('export-save-to-file')?.addEventListener('click', () => {
+        vscode.postMessage({
+            command: 'export.save.toFile',
+            payload: {
+                data: createExportDataString(Number.MAX_SAFE_INTEGER),
+                path: (document.getElementById('export-folder-path') as HTMLInputElement).value
+            }
+        });
+    });
+
+    document.getElementById('export-which-data')?.addEventListener('change', (e) => {
+        const exportDataScope = (e.target as HTMLInputElement).value as ExportDataScope;
+        if (exportDataScope === 'complete' && completeDatabase === null) {
+            vscode.postMessage({
+                command: 'export.load.completeDatabase',
+            });
+            setLoading(true);
+        }
     });
 
     for (let i = 0; i < updatePreviewChangeListenerIds.length; i++) {
