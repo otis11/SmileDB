@@ -166,7 +166,7 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
             const data = await connection.executeQueriesAndFetch([], {
                 ...queryConfig,
                 page: 0,
-                pageResultsLimit: 999999999,
+                pageResultsLimit: Number.MAX_SAFE_INTEGER,
             });
             app.panel?.webview.postMessage({ command: `export.load.completeDatabase.result`, payload: data });
         } catch (e: any) {
