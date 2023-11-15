@@ -1,4 +1,5 @@
 import { QueryResult, QueryResultField, QueryResultRow } from "../../../types";
+import { htmlSanitizeValue } from "../../webview-helper/htmlSanitize";
 import { vscode } from "../../webview-helper/vscode";
 import { getFilterDatabaseString } from "./filter";
 import { setLoading } from "./loading";
@@ -298,11 +299,11 @@ function createQueryPreviewElement(title: string, queries: string[]) {
     if (!queries) {
         return '';
     }
-    let queriesTitle = '<div class="queries-preview-title">-- ' + title + '</div>';
+    let queriesTitle = '<div class="queries-preview-title">-- ' + htmlSanitizeValue(title) + '</div>';
     let preString = '<pre>';
     for (let i = 0; i < queries.length; i++) {
         const element = queries[i];
-        preString += element + '\n';
+        preString += htmlSanitizeValue(element) + '\n';
     }
     preString += '</pre>';
     return queriesTitle + preString;

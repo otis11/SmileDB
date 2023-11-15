@@ -1,5 +1,6 @@
 import { provideVSCodeDesignSystem, vsCodeDivider } from "@vscode/webview-ui-toolkit";
 import { vscode } from "../../webview-helper/vscode";
+import { htmlSanitizeValue } from "../../webview-helper/htmlSanitize";
 
 provideVSCodeDesignSystem().register(
     vsCodeDivider(),
@@ -63,10 +64,10 @@ window.addEventListener('message', event => {
             const child = document.createElement('div');
             child.classList.add('active-connection');
             child.innerHTML = `
-                <div class="connection-name">${connection.name}</div>
-                <div class="connection-database">${connection.connection.database}</div>
-                <div class="connection-schema">${connection.connection.schema || '-'}</div>
-                <div class="connection-seconds-until-close">${connection.secondsUntilClose || 0}</div>
+                <div class="connection-name">${htmlSanitizeValue(connection.name)}</div>
+                <div class="connection-database">${htmlSanitizeValue(connection.connection.database)}</div>
+                <div class="connection-schema">${htmlSanitizeValue(connection.connection.schema || '-')}</div>
+                <div class="connection-seconds-until-close">${htmlSanitizeValue(connection.secondsUntilClose || 0)}</div>
             `;
             activeConnectionsContainerElement.appendChild(child);
             lastConnectionId = connection.id;

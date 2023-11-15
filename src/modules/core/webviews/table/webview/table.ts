@@ -1,6 +1,7 @@
 import { QueryResultRow } from "../../../types";
 import { createCodiconElement } from "../../webview-helper/codicon";
 import { getConnectionConfig } from "../../webview-helper/connectionConfig";
+import { htmlSanitizeValue } from "../../webview-helper/htmlSanitize";
 import { logDebug } from "../../webview-helper/logger";
 import { onTableFieldOrderByClick, renderOrderBy } from "./orderBy";
 import { getPage, getPageResultsLimit } from "./pagination";
@@ -217,8 +218,4 @@ export function createTableRow(i: number, row: QueryResultRow, isNewRow: boolean
     }
     rowElementString += '</div>';
     return rowElementString;
-}
-
-export function htmlSanitizeValue(value?: string) {
-    return value?.replace(/\</g, '&lt;').replace(/\>/g, '&gt;');
 }
