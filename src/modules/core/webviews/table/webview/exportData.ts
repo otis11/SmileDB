@@ -5,6 +5,7 @@ import { getQueryResult } from "./query";
 import { vscode } from "../../webview-helper/vscode";
 import { getConnectionConfig } from "../../webview-helper/connectionConfig";
 import { setLoading } from "./loading";
+import { copyToClipboard } from "../../webview-helper/copyToClipboard";
 
 type ExportDataFormat = 'CSV' | 'TXT';
 type ExportDataScope = 'current' | 'complete';
@@ -16,7 +17,7 @@ const updatePreviewChangeListenerIds = [
 ];
 let exportDataPreviewRowsCount = 5;
 let exportDataSeparator = ',';
-const exportDataSeparatorDefaults: Record<ExportDataFormat, string> = {
+export const exportDataSeparatorDefaults: Record<ExportDataFormat, string> = {
     CSV: ',',
     TXT: '    ',
 };
@@ -139,10 +140,7 @@ function addExportDataEventListeners() {
     });
 
     document.getElementById('export-copy-to-clipboard')?.addEventListener('click', () => {
-        vscode.postMessage({
-            command: 'copy.toClipboard',
-            payload: createExportDataString(Number.MAX_SAFE_INTEGER)
-        });
+        copyToClipboard(createExportDataString(Number.MAX_SAFE_INTEGER));
     });
 
     document.getElementById('export-save-to-file')?.addEventListener('click', () => {

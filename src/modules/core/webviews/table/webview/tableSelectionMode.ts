@@ -1,4 +1,6 @@
+import { copyToClipboard } from "../../webview-helper/copyToClipboard";
 import { selectTextInContentEditableDiv } from "../../webview-helper/selectTextInContentEditableDiv";
+import { exportDataSeparatorDefaults } from "./exportData";
 import { updateOnPushChangesState } from "./push";
 import { getQueryResultDeletions, setQueryResultDeletions } from "./query";
 import { getTableElement } from "./table";
@@ -156,6 +158,31 @@ export function addSelectedRowsToDeletion() {
 
     setQueryResultDeletions([...getQueryResultDeletions(), ...rows]);
     updateOnPushChangesState();
+}
+
+export function copySelectedColumns() {
+    const tableElement = getTableElement();
+    const selectedColumns = tableElement?.querySelectorAll('div.col--selected');
+    if (selectedColumns === undefined) {
+        return; // noting to copy
+    }
+
+    let content = '';
+    for (let i = 0; i < selectedColumns.length; i++) {
+        const col = selectedColumns[i];
+        if (col.classList.contains('row-number')) {
+            // remove extra separator at end of last column and add newline
+            content = content.slice(0, -1) + '\n';
+            continue;
+        }
+        let value = col.innerHTML;
+        if (value.includes(',')) {
+            value = `"${value}"`;
+        }
+        content += value + exportDataSeparatorDefaults['CSV'];
+    }
+    // remove last separator, maybe improve that separator only gets added at the correct locations
+    copyToClipboard(content.slice(0, -1));
 }
 
 export function renderSelectionModeContextMenu() {

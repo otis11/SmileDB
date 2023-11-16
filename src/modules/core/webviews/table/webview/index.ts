@@ -15,7 +15,7 @@ import "./exportData";
 import { onPushChangesClick, renderPushChanges, updateOnPushChangesState, updatePushChangesLoadingState } from "./push";
 import { getQueryResult, openQueriesPreview, requestExecuteQueryFetch, setQueryResult, setQueryResultChanges, setQueryResultDeletions, setQueryResultInsertions, setQueryResultTimeInMilliseconds, updateQueryTimeInMilliseconds } from "./query";
 import { renderTable, renderTableResult } from "./table";
-import { renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode";
+import { copySelectedColumns, renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode";
 import { setCompleteDatabaseExport, updateExportDataFolderLocation } from "./exportData";
 import { closePopup } from "./popup";
 
@@ -176,6 +176,13 @@ registerShortcuts([
             Enter: true,
         },
         callback: onPushChangesClick
+    },
+    {
+        keys: {
+            Control: true,
+            c: true,
+        },
+        callback: copySelectedColumns
     }
 ]);
 

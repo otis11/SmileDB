@@ -25,6 +25,7 @@
 | Alt + d |  Activate the database side filter and focus it. |
 | Alt + q |  Activate the query input and focus it. |
 | Ctrl + s |  Switch between Edit and Select Mode. |
+| Ctrl + c |  Copy selected columns in `CSV` format. |
 
 ### Query Examples
 Some implementations need to improve a lot until they are more usable.
