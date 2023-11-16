@@ -2,7 +2,7 @@
     "name": "smiledb",
     "displayName": "SmileDB",
     "description": "A tool to interact with multiple database systems inside VSCode (:",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "icon": "resources/logo.png",
     "pricing": "Free",
     "engines": {

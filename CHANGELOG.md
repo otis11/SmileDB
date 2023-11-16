@@ -1,4 +1,18 @@
 # Change Log
 
+## [0.1.1] 16.11.2023
+- Export Table Data [#1](https://github.com/eat4/SmileDB/pull/1)
+    - Add export data icon to table view header to open a popup and export table data
+    - Add copy to clipboard into the export data popup
+    - Add save to file into the export data popup
+    - Add select data table scope (current selection, full database) into the export data popup
+    - Add 2 Checkboxes to optionally add the column header and row numbers to the exported data
+    - Add select data export format into the export data popup
+    - Add `TXT` as supported data export format
+    - Add `CSV` as supported data export
+- Sanitize html values in missing locations [84a4597](https://github.com/eat4/SmileDB/commit/84a4597d301dd3641a7d149f3e7abaab7139c2f4)
+- Add copy label option to tree view items [52fef56](https://github.com/eat4/SmileDB/commit/52fef56e1d1950eff8a029b5e8e3e2a95dcbee1e)
+- Add copy selected columns to clipboard support `Ctrl + c` (format: `CSV`) [de71fcc](https://github.com/eat4/SmileDB/commit/de71fcc40c1a0367c5ed07351049451df6dc5655)
+
 ## [0.1.0] Unreleased
 - Initial Release
