@@ -95,3 +95,7 @@ async function showInformationMessage(message: string, timeout: number = 2000) {
 export function copyToClipboard(str: string) {
     vscode.env.clipboard.writeText(str);
 }
+
+export function jsonStringify(value: any) {
+    return typeof value === 'object' ? JSON.stringify(value) : value;
+}

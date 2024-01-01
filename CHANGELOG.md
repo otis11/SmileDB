@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.1.2]
+- Redis support the following data types when retrieving data: `String`, `List`, `Set`, `Hash`, `Sorted Set`
+- Redis improve the feedback when running queries by returning the result  in the value field with the key field just containing `result`
+- Redis support querying multiple queries at once: e.g. `SET x y SET a b`
+
 ## [0.1.1] 16.11.2023
 - Export Table Data [#1](https://github.com/eat4/SmileDB/pull/1)
     - Add export data icon to table view header to open a popup and export table data

@@ -1,11 +1,27 @@
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultRow, Timer } from "../core";
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultRow, Timer, jsonStringify } from "../core";
 import Redis from 'ioredis';
+
+const REDIS_START_COMMAND_KEYWORDS = [
+    'set', 'get', 'del', 'hset', 'hget', 'scan', 'select',
+    'append', 'bitcount', 'bitfield', 'bitop', 'bitpos', 'decr', 'decrby', 'getbit', 'getrange', 'getset', 'incr', 'incrby', 'incrbyfloat', 'mget', 'mset', 'msetnx', 'psetex', 'setbit', 'setex', 'setnx', 'setrange', 'strlen',
+    'hdel', 'hexists', 'hgetall', 'hincrby', 'hincrbyfloat', 'hkeys', 'hlen', 'hmget', 'hmset', 'hsetnx', 'hvals', 'hscan',
+    'blpop', 'brpop', 'brpoplpush', 'lindex', 'linsert', 'llen', 'lpop', 'lpush', 'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'rpop', 'rpoplpush', 'rpush', 'rpushx',
+    'sadd', 'scard', 'sdiff', 'sdiffstore', 'sinter', 'sinterstore', 'sismember', 'smembers', 'smove', 'spop', 'srandmember', 'srem', 'sunion', 'sunionstore', 'sscan',
+    'zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zlexcount', 'zrange', 'zrangebylex', 'zrevrangebylex', 'zrangebyscore', 'zrank', 'zrem', 'zremrangebylex', 'zremrangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebyscore', 'zrevrank', 'zscore', 'zunionstore', 'zscan',
+    'del', 'dump', 'exists', 'expire', 'expireat', 'keys', 'migrate', 'move', 'object', 'persist', 'pexpire', 'pexpireat', 'pttl', 'randomkey', 'rename', 'renamenx', 'restore', 'sort', 'ttl', 'type', 'scan',
+    'discard', 'exec', 'multi', 'unwatch', 'watch',
+    'psubscribe', 'publish', 'pubsub', 'punsubscribe', 'subscribe', 'unsubscribe',
+    'eval', 'evalsha', 'script',
+    'auth', 'echo', 'ping', 'quit', 'select',
+    'bgrewriteaof', 'bgsave', 'client', 'command', 'config', 'dbsize', 'debug', 'flushall', 'flushdb', 'info', 'lastsave', 'monitor', 'role', 'save', 'shutdown', 'slaveof', 'slowlog', 'sync', 'time'
+];
 
 export class RedisPoolConnection implements PoolConnection {
     private pool: Redis | null = null;
     private isRedisConnected = false;
     private readonly redisKeyForKey: string = 'Redis Key';
     private readonly redisKeyForValue = 'Redis Value';
+    private readonly redisPlaceholderForDoubleQuote = 'PLACEHOLDER_FOR_DOUBLE_QUOTE';
 
     constructor(public config: PoolConnectionConfig) { }
 
@@ -101,15 +117,13 @@ export class RedisPoolConnection implements PoolConnection {
     }
 
     buildQueriesFetch(queryConfig: QueryConfigFetch) {
-        return [`SELECT ${queryConfig.database}
-SCAN ${queryConfig.page}
-COUNT ${queryConfig.pageResultsLimit}`];
+        return [`SELECT ${queryConfig.database} SCAN ${queryConfig.page} COUNT ${queryConfig.pageResultsLimit}`];
     }
 
     buildQueriesInsert(insertions: DatabaseObjectInsert, queryConfig: QueryConfigInsert) {
         const queries = [];
         for (let i = 0; i < insertions.insertions.length; i++) {
-            queries.push(`SET "${insertions.insertions[i][this.redisKeyForKey]}" "${insertions.insertions[i][this.redisKeyForValue]}"`);
+            queries.push(`SET "${insertions.insertions[i][this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}" "${insertions.insertions[i][this.redisKeyForValue]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
         }
         return queries;
     }
@@ -117,64 +131,91 @@ COUNT ${queryConfig.pageResultsLimit}`];
     buildQueriesUpdate(changes: DatabaseObjectUpdate[], queryConfig: QueryConfigUpdate) {
         const queries = [];
         for (let i = 0; i < changes.length; i++) {
-            queries.push(`SET "${changes[i].where[this.redisKeyForKey]}" "${changes[i].update[this.redisKeyForValue]}"`);
+            queries.push(`SET "${changes[i].where[this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}" "${changes[i].update[this.redisKeyForValue]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
         }
         return queries;
     }
 
     async executeQuery(query: string) {
-        await this.executeQueryString(query);
-        // TODO
+        const timer = new Timer();
+        const result = await this.executeQueryString(query);
         return {
-            rows: [],
-            fields: [],
+            fields: this.getQueryResultRedisFields(),
+            rows: result.rows,
             stats: {
-                timeInMilliseconds: 0,
+                rowCount: result.rowCount,
+                timeInMilliseconds: timer.stop()
             }
         };
     }
 
     private async executeQueryString(query: string) {
         await this.connectToRedis();
-        const selectMatch = query.match(/SELECT (.*)/);
-        const scanMatch = query.match(/SCAN (.*)/);
-        const countMatch = query.match(/COUNT (.*)/);
-        const setMatch = query.match(/SET (.*)/);
-        const deleteMatch = query.match(/DEL (.*)/);
-        let rows = [];
-        if (selectMatch) {
-            await this.pool?.select(selectMatch[1]);
+        const rows: QueryResultRow[] = [];
+        const regex = /("[^"]+"|'[^']+'|\S+)/g;
+        const args = query.match(regex);
+        if (args === null) {
+            return {
+                rows: [],
+                rowCount: 0,
+            };
         }
-
-        if (scanMatch) {
-            let cursor = scanMatch[1];
-            const count = countMatch ? parseInt(countMatch[1]) : 100;
-            const result = await this.pool?.scan(cursor, 'MATCH', '*', 'COUNT', count) as any;
-            for (let i = 0; i < result[1].length; i++) {
-                rows.push({
-                    [this.redisKeyForValue]: await this.pool?.get(result[1][i]),
-                    [this.redisKeyForKey]: result[1][i]
-                });
+        const commands: string[][] = [];
+        for (const arg of args) {
+            if (REDIS_START_COMMAND_KEYWORDS.includes(arg.toLowerCase())) {
+                commands.push([]);
             }
+            commands.at(-1)?.push(arg.replace(/"/g, '').replace(new RegExp(this.redisPlaceholderForDoubleQuote, 'g'), '"'));
+        }
+        // doesnt seem to work correctly with multi
+        //const result = await this.pool?.multi(commands).exec();
+        let result: string[] = [];
+        for (const command of commands) {
+            result = await this.pool?.call(command[0], ...command.slice(1)) as string[];
         }
 
-        if (setMatch) {
-            const mtch = setMatch[1];
-            const key = mtch.slice(1, mtch.indexOf('" "'));
-            const value = mtch.slice(mtch.indexOf('" "') + 3, mtch.length - 1);
-            await this.pool?.set(key, value);
+        // custom queries, eg "get x" just returns "y" should be improved further at some point
+        if (!Array.isArray(result) || !Array.isArray(result[1])) {
+            return {
+                rows: [{
+                    [this.redisKeyForValue]: jsonStringify(result),
+                    [this.redisKeyForKey]: 'result'
+                }],
+                rowCount: await this.pool?.dbsize() || 0,
+            };
         }
 
-        if (deleteMatch) {
-            const keysToDelete = deleteMatch[1].split(' ');
-            this.pool?.del(keysToDelete);
+        for (let i = 0; i < result[1].length; i++) {
+            // TODO inefficient, there needs to be something better
+            const key = result[1][i];
+            const type = await this.pool?.type(key);
+            rows.push({
+                [this.redisKeyForValue]: jsonStringify(await this.getRedisValue(key, type)),
+                [this.redisKeyForKey]: result[1][i]
+            });
         }
-
-        const rowCount = await this.pool?.dbsize() || 0;
         return {
             rows,
-            rowCount
+            rowCount: await this.pool?.dbsize() || 0,
         };
+    }
+
+    private async getRedisValue(key: string, type: string | undefined) {
+        if (type === 'string') {
+            return this.pool?.get(key);
+        }
+        if (type === 'hash') {
+            return this.pool?.hgetall(key);
+        }
+        if (type === 'list') {
+            return this.pool?.lrange(key, 0, -1);
+        }
+        if (type === 'set') {
+            return this.pool?.smembers(key);
+        }
+        if (type === 'zset') {
+            return this.pool?.zrange(key, 0, -1);
+        }
     }
 
     private getQueryResultRedisFields(): QueryResultField[] {
