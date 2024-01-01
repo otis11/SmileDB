@@ -16,7 +16,16 @@ const REDIS_START_COMMAND_KEYWORDS = [
     'bgrewriteaof', 'bgsave', 'client', 'command', 'config', 'dbsize', 'debug', 'flushall', 'flushdb', 'info', 'lastsave', 'monitor', 'role', 'save', 'shutdown', 'slaveof', 'slowlog', 'sync', 'time'
 ];
 
+const REDIS_TYPES = {
+    hash: 'hash',
+    string: 'string',
+    list: 'list',
+    set: 'set',
+    zset: 'zset'
+};
+
 export class RedisPoolConnection implements PoolConnection {
+    private keyTypeCache: Record<string, string> = {};
     private pool: Redis | null = null;
     private isRedisConnected = false;
     private readonly redisKeyForKey: string = 'Redis Key';
@@ -131,7 +140,41 @@ export class RedisPoolConnection implements PoolConnection {
     buildQueriesUpdate(changes: DatabaseObjectUpdate[], queryConfig: QueryConfigUpdate) {
         const queries = [];
         for (let i = 0; i < changes.length; i++) {
-            queries.push(`SET "${changes[i].where[this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}" "${changes[i].update[this.redisKeyForValue]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
+            const key = `${changes[i].where[this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}`;
+            const value = changes[i].update[this.redisKeyForValue] as string;
+            if (this.keyTypeCache[key] === REDIS_TYPES.string) {
+                queries.push(`SET ${key} "${value?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
+            }
+            if (this.keyTypeCache[key] === REDIS_TYPES.hash) {
+                // incoming as json object {'key1': 'value1'}
+                const object = JSON.parse(value);
+                for (const hashKey of Object.keys(object)) {
+                    queries.push(`HSET ${key} "${hashKey}" "${object[hashKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
+                }
+            }
+            else {
+                // incoming as json array ["x", "y"]
+                let addCommandKeyword = '';
+                if (this.keyTypeCache[key] === REDIS_TYPES.list) {
+                    addCommandKeyword = 'RPUSH';
+                }
+                if (this.keyTypeCache[key] === REDIS_TYPES.set) {
+                    addCommandKeyword = 'SADD';
+                }
+                if (this.keyTypeCache[key] === REDIS_TYPES.zset) {
+                    addCommandKeyword = 'ZADD';
+                }
+                const array = JSON.parse(value);
+                // delete old set/array
+                queries.push(`DEL ${key}`);
+
+                // push all, zadd needs counting
+                if (this.keyTypeCache[key] === REDIS_TYPES.zset) {
+                    queries.push(`${addCommandKeyword} ${key} ${array.map((v: { toString: () => string; }, index: number) => (index + 1) + ' "' + v?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote) + '"').join(' ')}`);
+                } else {
+                    queries.push(`${addCommandKeyword} ${key} ${array.map((v: { toString: () => string; }) => '"' + v?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote) + '"').join(' ')}`);
+                }
+            }
         }
         return queries;
     }
@@ -188,7 +231,10 @@ export class RedisPoolConnection implements PoolConnection {
         for (let i = 0; i < result[1].length; i++) {
             // TODO inefficient, there needs to be something better
             const key = result[1][i];
-            const type = await this.pool?.type(key);
+            const type = this.keyTypeCache[key] ? this.keyTypeCache[key] : await this.pool?.type(key);
+            if (type) {
+                this.keyTypeCache[key] = type;
+            }
             rows.push({
                 [this.redisKeyForValue]: jsonStringify(await this.getRedisValue(key, type)),
                 [this.redisKeyForKey]: result[1][i]
@@ -201,19 +247,19 @@ export class RedisPoolConnection implements PoolConnection {
     }
 
     private async getRedisValue(key: string, type: string | undefined) {
-        if (type === 'string') {
+        if (type === REDIS_TYPES.string) {
             return this.pool?.get(key);
         }
-        if (type === 'hash') {
+        if (type === REDIS_TYPES.hash) {
             return this.pool?.hgetall(key);
         }
-        if (type === 'list') {
+        if (type === REDIS_TYPES.list) {
             return this.pool?.lrange(key, 0, -1);
         }
-        if (type === 'set') {
+        if (type === REDIS_TYPES.set) {
             return this.pool?.smembers(key);
         }
-        if (type === 'zset') {
+        if (type === REDIS_TYPES.zset) {
             return this.pool?.zrange(key, 0, -1);
         }
     }
