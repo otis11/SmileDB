@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.1.2]
+## [0.1.2] 01.01.2024
 - Redis support the following data types when retrieving data: `String`, `List`, `Set`, `Hash`, `Sorted Set` [582bc50](https://github.com/eat4/SmileDB/commit/582bc504acf157ecfc0ac3134f2a10ba46758372)
 - Redis support updating the following data types: `String`, `List`, `Set`, `Hash`, `Sorted Set` [5e73f97](https://github.com/eat4/SmileDB/commit/5e73f972324fdf17a1b144bf4997bfa5c4a067c2)
 - Redis improve the feedback when running queries by returning the result  in the value field with the key field just containing `result` [582bc50](https://github.com/eat4/SmileDB/commit/582bc504acf157ecfc0ac3134f2a10ba46758372)
