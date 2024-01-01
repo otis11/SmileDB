@@ -145,7 +145,7 @@ export class RedisPoolConnection implements PoolConnection {
             if (this.keyTypeCache[key] === REDIS_TYPES.string) {
                 queries.push(`SET ${key} "${value?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
             }
-            if (this.keyTypeCache[key] === REDIS_TYPES.hash) {
+            else if (this.keyTypeCache[key] === REDIS_TYPES.hash) {
                 // incoming as json object {'key1': 'value1'}
                 const object = JSON.parse(value);
                 for (const hashKey of Object.keys(object)) {
