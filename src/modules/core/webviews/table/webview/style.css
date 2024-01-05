@@ -136,6 +136,12 @@ body {
     background-color: var(--color-vertical-divider);
 }
 
+.horizontal-divider {
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-vertical-divider);
+}
+
 #error-message {
     margin-left: 12px;
 }

@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.1.3] 05.01.2024
+- Table: fix a bug which didn't allow copying selected text
+- Table right click context menu improvements:
+    - add selection options:`Select All`, `Select Row` and `Select Column`
+    - add `Set NULL` to set a column NULL
+    - seperate `Delete Rows` and `Clear: Delete Rows` into `Delete Row`, `Clear: Delete Row` and `Selected Delete Rows `, `Clear: Selected Delete Rows`
+    - group options by adding multiple horizontal dividers
+
 ## [0.1.2] 01.01.2024
 - Redis support the following data types when retrieving data: `String`, `List`, `Set`, `Hash`, `Sorted Set` [582bc50](https://github.com/eat4/SmileDB/commit/582bc504acf157ecfc0ac3134f2a10ba46758372)
 - Redis support updating the following data types: `String`, `List`, `Set`, `Hash`, `Sorted Set` [5e73f97](https://github.com/eat4/SmileDB/commit/5e73f972324fdf17a1b144bf4997bfa5c4a067c2)
