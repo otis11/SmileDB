@@ -2,21 +2,23 @@
     --table-col-width: 180px;
     --color-row-selected: rgba(255, 255, 255, .03);
     --color-vertical-divider: rgba(255, 255, 255, .1);
-    --color-secondary: #2f363d;
-    --color-dark: #24292e;
-    --color-error: #f97583;
     --color-row-delete: rgba(249, 117, 131, 0.2);
     --color-row-add: rgba(115, 201, 145, 0.2);
     --color-col-change: rgba(184, 149, 0, 0.2);
-    --color-success: rgb(115, 201, 145);
-    --color-disabled: #cccccc80;
-    --color-foreground: #e1e4e8;
-    --color-search-result: #b89500;
     --color-col-selected: #007acc;
+
+    --color-background: var(--vscode-editor-background, #24292e);
+    --font-family: var(--vscode-editor-font-family, --vscode-font-family);
+    --color-primary: var(--vscode-editorIndentGuide-background, #2f363d);
+    --color-error: var(--vscode-errorForeground, #f97583);
+    --color-foreground: var(--vscode-editor-foreground, #e1e4e8);
+    --color-success: var(--vscode-testing-iconPassed, rgb(115, 201, 145));
+    --color-disabled: var(--vscode-disabledForeground, #cccccc80);
+    --color-search-result: var(--vscode-editor-findMatchHighlightBackground, #b89500);
 }
 
 * {
-    font-family: var(--vscode-editor-font-family, --vscode-font-family);
+    font-family: var(--font-family);
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -31,11 +33,11 @@
 }
 
 .error {
-    color: var(--vscode-errorForeground, var(--color-success));
+    color: var(--color-error);
 }
 
 .success {
-    color: var(--vscode-testing-iconPassed, var(--color-success));
+    color: var(--color-success);
 }
 
 body {
@@ -46,7 +48,7 @@ body {
 
 
 #readonly-notice {
-    color: var(--vscode-errorForeground, var(--color-error));
+    color: var(--color-error);
     font-weight: bold;
     padding: 0 46px;
     width: 100%;
@@ -56,7 +58,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    background: var(--vscode-dropdown-border, var(--color-secondary));
+    background: var(--color-primary);
     width: 100%;
     z-index: 2;
     display: flex;
@@ -72,16 +74,16 @@ body {
 }
 
 #header-filter {
-    background-color: var(--vscode-editor-background, var(--color-dark));
+    background-color: var(--color-background);
     min-height: 34px;
     padding-top: 0;
     padding-bottom: 0;
-    border-bottom: 1px solid var(--vscode-dropdown-border, var(--color-secondary));
+    border-bottom: 1px solid var(--color-primary);
 }
 
 #header-filter .codicon,
 #header-filter span {
-    color: var(--vscode-disabledForeground, var(--color-disabled));
+    color: var(--color-disabled);
 }
 
 #header-filter span {
@@ -93,7 +95,7 @@ body {
     outline: none !important;
     height: 34px;
     background: transparent;
-    color: var(--vscode-editor-foreground, var(--color-foreground));
+    color: var(--color-foreground);
     width: 100%;
 }
 
@@ -114,14 +116,14 @@ body {
 }
 
 #error-message-container {
-    background-color: var(--vscode-editor-background, var(--color-dark));
-    border-left: 3px solid var(--vscode-errorForeground, var(--color-error));
+    background-color: var(--color-background);
+    border-left: 3px solid var(--color-error);
     padding: 12px;
-    color: var(--vscode-errorForeground, var(--color-error));
+    color: var(--color-error);
     font-weight: bold;
     padding: 12px;
     display: flex;
-    border-bottom: 1px solid var(--vscode-dropdown-border, var(--color-secondary));
+    border-bottom: 1px solid var(--color-primary);
 }
 
 #error-message-container .codicon {
@@ -148,7 +150,7 @@ body {
 
 .disabled {
     pointer-events: none;
-    color: var(--vscode-disabledForeground, var(--color-disabled));
+    color: var(--color-disabled);
 }
 
 vscode-text-field {
@@ -185,7 +187,7 @@ vscode-text-field {
     outline: none;
     border: none;
     background: transparent;
-    color: var(--vscode-editor-foreground, var(--color-foreground));
+    color: var(--color-foreground);
 }
 
 #pagination-rows-select-after {
@@ -241,9 +243,9 @@ vscode-text-field {
 }
 
 .table-header-col {
-    background: var(--vscode-dropdown-border, var(--color-secondary));
+    background: var(--color-primary);
     padding: 2px 8px;
-    border-right: 1px solid var(--vscode-editor-background, var(--color-dark));
+    border-right: 1px solid var(--color-background);
     min-width: var(--table-col-width);
     max-width: var(--table-col-width);
     display: flex;
@@ -270,12 +272,12 @@ vscode-text-field {
 
 .row-number {
     min-width: 40px;
-    border-right: 1px solid var(--vscode-dropdown-border, var(--color-secondary));
+    border-right: 1px solid var(--color-primary);
     line-height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--vscode-dropdown-border, var(--color-secondary));
+    background: var(--color-primary);
 }
 
 .col {
@@ -283,8 +285,8 @@ vscode-text-field {
     min-width: var(--table-col-width);
     max-width: var(--table-col-width);
     padding: 4px 8px;
-    border-bottom: 1px solid var(--vscode-dropdown-border, var(--color-secondary));
-    border-right: 1px solid var(--vscode-dropdown-border, var(--color-secondary));
+    border-bottom: 1px solid var(--color-primary);
+    border-right: 1px solid var(--color-primary);
     outline: none;
     overflow-x: auto;
     overflow-y: hidden;
@@ -292,7 +294,7 @@ vscode-text-field {
 }
 
 .col--search {
-    background-color: var(--vscode-inputValidation-warningBorder, var(--color-search-result));
+    background-color: var(--color-search-result);
 }
 
 .col.col--selected {
@@ -361,12 +363,12 @@ vscode-text-field {
     position: absolute;
     top: 20px;
     border-radius: 4px;
-    background-color: var(--vscode-editor-background, var(--color-dark));
-    border: 1px solid var(--vscode-dropdown-border, var(--color-secondary));
+    background-color: var(--color-background);
+    border: 1px solid var(--color-primary);
 }
 
 .select-options .select-option:hover {
-    background-color: var(--vscode-dropdown-border);
+    background-color: var(--color-primary);
 }
 
 .select-option i,
@@ -429,7 +431,7 @@ vscode-text-field {
 }
 
 #error-close .codicon {
-    color: var(--vscode-editor-foreground);
+    color: var(--color-foreground);
 }
 
 #header-filter-query-input {
@@ -451,7 +453,7 @@ vscode-text-field {
 }
 
 #header-filter-query #header-filter-query-run.success {
-    color: var(--vscode-testing-iconPassed, var(--color-success));
+    color: var(--color-success);
 }
 
 #popup {
@@ -465,7 +467,7 @@ vscode-text-field {
     justify-content: center;
     top: 0;
     left: 0;
-    color: var(--vscode-editor-foreground, var(--color-foreground));
+    color: var(--color-foreground);
 }
 
 #popup-content {
@@ -473,7 +475,7 @@ vscode-text-field {
     border-radius: 8px;
     height: 90%;
     width: 90%;
-    background-color: var(--vscode-editor-background, var(--color-dark));
+    background-color: var(--color-background);
     border-radius: 12px;
     padding: 16px;
 }
