@@ -12,7 +12,7 @@
 }
 
 .error {
-    color: var(--vscode-errorForeground, var(--color-success));
+    color: var(--vscode-errorForeground, var(--color-error));
 }
 
 .success {
