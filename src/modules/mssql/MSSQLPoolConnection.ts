@@ -124,7 +124,7 @@ export class MSSQLPoolConnection implements PoolConnection {
     private createOrderBy(configOrderBy?: OrderByConfig) {
         let orderBy = '';
         if (!configOrderBy) {
-            return 'ORDER BY Id';
+            return 'ORDER BY 1';
         };
         orderBy += 'ORDER BY ' + configOrderBy.field;
         orderBy += configOrderBy.direction === 'ascending' ? ' ASC' : ' DESC';
@@ -182,14 +182,18 @@ ${whereStatements}`);
         return queries;
     }
 
-    async executeQuery(query: string) {
+    async executeQuery(query: string): Promise<QueryResult> {
         const timer = new Timer();
         const result = await this.query(query);
         return {
-            // @ts-ignore
-            fields: this.createQueryResultFields(result),
-            // @ts-ignore
-            rows: result.recordsets[0],
+            fields: [{
+                flags: [],
+                name: 'rowsAffected',
+                type: ''
+            }],
+            rows: [{
+                rowsAffected: result.rowsAffected[0]
+            }],
             stats: {
                 timeInMilliseconds: timer.stop()
             }
