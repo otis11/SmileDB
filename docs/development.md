@@ -1,7 +1,7 @@
 ### Local Development
 1. Clone Project
 ```bash
-git clone https://github.com/eat4/SmileDB.git
+git clone https://github.com/otis11/SmileDB.git
 ```
 2. Install dependencies
 ```bash

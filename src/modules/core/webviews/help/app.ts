@@ -37,7 +37,7 @@ function getHtmlBody(): string {
         <h2>Hello! :)</h2>
         <vscode-divider></vscode-divider>
         <vscode-link href="#" id="go-to-settings">Open UI Settings</vscode-link>
-        <vscode-link href="https://github.com/eat4/SmileDB/blob/main/docs/usage.md">Documentation [GitHub]</vscode-link>
+        <vscode-link href="https://github.com/otis11/SmileDB/blob/main/docs/usage.md">Documentation [GitHub]</vscode-link>
     </div>
     `;
 }

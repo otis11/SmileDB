@@ -14,7 +14,7 @@
         "Data Science"
     ],
     "bugs": {
-        "url": "https://github.com/eat4/SmileDB/issues"
+        "url": "https://github.com/otis11/SmileDB/issues"
     },
     "keywords": [
         "Redis",
@@ -23,10 +23,10 @@
         "Database",
         "SmileDB"
     ],
-    "publisher": "eat4",
+    "publisher": "otis11",
     "repository": {
         "type": "git",
-        "url": "https://github.com/eat4/SmileDB"
+        "url": "https://github.com/otis11/SmileDB"
     },
     "activationEvents": [],
     "main": "./dist/extension.js",
