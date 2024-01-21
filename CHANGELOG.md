@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.1.5] 21.01.2024
+- Update README (replace preview image with gif, add mssql as supported database system)
+
 ## [0.1.4] 09.01.2024
 - Theme: improve the colors that are adopted from the active VSCode Color Theme.
 - Fixed a bug which caused the command `SmileDB Open Active Database Connections` to not display any open connection.

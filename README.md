@@ -1,9 +1,8 @@
 # SmileDB
 A tool to interact with multiple database systems inside VSCode (:
+![Video Preview](./docs/smiledb.gif)
 
 > **_NOTE:_** This extension is in an experimental phase, and its future development is uncertain.
-
-
 
 ### Documentation
 - [changelog](./CHANGELOG.md)
@@ -13,9 +12,8 @@ A tool to interact with multiple database systems inside VSCode (:
 ### Supported database systems
 - PostgreSQL
 - MySQL
+- MSSQL
 - MongoDB
 - MariaDB
 - Redis
 
-### Preview
-![Preview](./docs/images/smiledb.png)
