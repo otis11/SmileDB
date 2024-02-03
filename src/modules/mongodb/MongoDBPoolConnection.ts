@@ -52,7 +52,44 @@ export class MongoDBPoolConnection implements PoolConnection {
 
     async fetchTables(): Promise<QueryResult> {
         const timer = new Timer()
-        const result = (await this.client?.db(this.config.connection.database).listCollections().toArray())
+        const result = (await this.client?.db(this.config.connection.database).listCollections({
+            type: 'collection'
+        }).toArray())
+        return {
+            fields: [{
+                name: 'name',
+                type: '',
+                flags: [],
+            }],
+            rows: result,
+            stats: {
+                timeInMilliseconds: timer.stop()
+            }
+        }
+    }
+
+    async fetchDatabaseStats(): Promise<QueryResult> {
+        const timer = new Timer()
+        const result = await this.client?.db(this.config.connection.database).stats()
+        return {
+            fields: [{
+                name: 'name',
+                type: '',
+                flags: [],
+            }],
+            rows: [result],
+            stats: {
+                timeInMilliseconds: timer.stop()
+            }
+        }
+    }
+
+
+    async fetchViews(): Promise<QueryResult> {
+        const timer = new Timer()
+        const result = (await this.client?.db(this.config.connection.database).listCollections({
+            type: 'view'
+        }).toArray())
         return {
             fields: [{
                 name: 'name',

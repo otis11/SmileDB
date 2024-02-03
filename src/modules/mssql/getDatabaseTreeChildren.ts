@@ -35,20 +35,22 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
     else if (item instanceof SchemaTreeItem) {
         const connection = getPoolConnection(item.connectionConfig) as MSSQLPoolConnection
         const { rows } = await connection.fetchDatabaseStats()
+        const totalTables = parseInt(rows[0].TotalTables?.toString() || "0")
+        const totalViews = parseInt(rows[0].TotalViews?.toString() || "0")
         return [
             new FolderTreeItem({
                 label: "tables",
                 contextValue: "tableFolder",
-                description: rows[0].TotalTables?.toString(),
+                description: totalTables.toString(),
                 connectionConfig: item.connectionConfig,
-                state: rows[0].TotalTables > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+                state: totalTables > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
             }),
             new FolderTreeItem({
                 label: "views",
                 contextValue: "viewFolder",
                 connectionConfig: item.connectionConfig,
-                description: rows[0].TotalViews?.toString(),
-                state: rows[0].TotalViews > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+                description: totalViews.toString(),
+                state: totalViews > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
             }),
         ]
     }
