@@ -9,4 +9,4 @@ module.exports = {
     "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/semi": ["error", "never"],
   }
-};
+}
