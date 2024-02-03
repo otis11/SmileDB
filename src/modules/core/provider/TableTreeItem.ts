@@ -1,10 +1,9 @@
-import { TreeItem, TreeItemCollapsibleState, Uri } from "vscode"
-import { PoolConnectionConfig, QueryConfigBase } from "../types"
+import { TreeItem, TreeItemCollapsibleState } from "vscode"
 import { getIconDarkLightPaths } from "../common"
+import { PoolConnectionConfig } from "../types"
 
 export class TableTreeItem extends TreeItem {
     constructor(
-        public readonly extensionUri: Uri,
         public readonly connectionConfig: PoolConnectionConfig,
         public readonly table: string,
     ) {
@@ -13,7 +12,7 @@ export class TableTreeItem extends TreeItem {
         this.contextValue = "table"
     }
 
-    iconPath = getIconDarkLightPaths(this.extensionUri, 'table.svg')
+    iconPath = getIconDarkLightPaths('table.svg')
 
     command = {
         command: 'SmileDB.openTable',

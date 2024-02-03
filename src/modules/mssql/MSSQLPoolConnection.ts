@@ -94,7 +94,38 @@ export class MSSQLPoolConnection implements PoolConnection {
         const timer = new Timer()
         const queryResult = await this.query(`SELECT *
                                             FROM ${this.config.connection.database}.information_schema.tables
-                                            WHERE TABLE_SCHEMA = '${this.config.connection.schema}'`)
+                                            WHERE TABLE_SCHEMA = '${this.config.connection.schema}'
+                                            AND TABLE_TYPE NOT LIKE 'VIEW'`)
+        return {
+            rows: this.getQueryResultRows(queryResult),
+            fields: [this.createQueryResultField(queryResult.recordset.columns.TABLE_NAME as any)],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchDatabaseStats() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT
+                                            (select count(*) from ${this.config.connection.database}.information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND TABLE_TYPE NOT LIKE 'VIEW') as TotalTables,
+                                            (select count(*) from ${this.config.connection.database}.information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}') as TotalViews
+                                           `)
+        return {
+            rows: this.getQueryResultRows(queryResult),
+            fields: [],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchViews() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT *
+                                            FROM ${this.config.connection.database}.information_schema.views
+                                            WHERE TABLE_SCHEMA = '${this.config.connection.schema}'
+                                            `)
         return {
             rows: this.getQueryResultRows(queryResult),
             fields: [this.createQueryResultField(queryResult.recordset.columns.TABLE_NAME as any)],

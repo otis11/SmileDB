@@ -1,10 +1,9 @@
-import { TreeItem, TreeItemCollapsibleState, Uri } from "vscode"
+import { TreeItem, TreeItemCollapsibleState } from "vscode"
 import { getConnectionClientModule, getIconDarkLightPaths, isPoolConnectionConfigActive } from "../common"
 import { PoolConnectionConfig } from "../types"
 
 export class PoolConnectionTreeItem extends TreeItem {
     constructor(
-        public readonly extensionUri: Uri,
         public readonly connectionConfig: PoolConnectionConfig,
     ) {
         super(connectionConfig.name, TreeItemCollapsibleState.Collapsed)
@@ -19,10 +18,7 @@ export class PoolConnectionTreeItem extends TreeItem {
             icon = getConnectionClientModule(connectionConfig.moduleName).icon
         }
 
-        this.iconPath = getIconDarkLightPaths(
-            this.extensionUri,
-            icon,
-        )
+        this.iconPath = getIconDarkLightPaths(icon)
 
     }
 }

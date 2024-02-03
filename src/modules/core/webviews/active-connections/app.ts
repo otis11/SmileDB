@@ -1,8 +1,7 @@
-import { Uri } from "vscode"
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
-import { ExtensionStorage, getActiveConnectionConfigs, getIconDarkLightPaths } from "../../common"
+import { getActiveConnectionConfigs, getIconDarkLightPaths } from "../../common"
 
-export function renderActiveConnectionsApp(extensionUri: Uri, storage: ExtensionStorage) {
+export function renderActiveConnectionsApp() {
     const id = `stats`
     let app = getApp(id)
     if (app) {
@@ -15,12 +14,11 @@ export function renderActiveConnectionsApp(extensionUri: Uri, storage: Extension
         title: "SmileDB Active Connections",
         webviewPath: ['active-connections'],
         onWebviewMessage,
-        iconPath: getIconDarkLightPaths(extensionUri, 'layers-active.svg'),
+        iconPath: getIconDarkLightPaths('layers-active.svg'),
         htmlBody: getHtmlBody(),
-        storage,
     }
 
-    renderWebviewApp(extensionUri, app)
+    renderWebviewApp(app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {

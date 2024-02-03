@@ -1,20 +1,19 @@
-import { ExtensionContext } from "vscode"
 import { ConnectionClientModule, Module, ModuleName } from "../types"
 
 const modules: Module[] = []
 const connectionClientModules: ConnectionClientModule[] = []
 
-export function installModule(module: Module, context: ExtensionContext) {
+export function installModule(module: Module) {
     modules.push(module)
     if (module.install) {
-        module.install(context)
+        module.install()
     }
 }
 
-export function installConnectionClientModule(module: ConnectionClientModule, context: ExtensionContext) {
+export function installConnectionClientModule(module: ConnectionClientModule) {
     connectionClientModules.push(module)
     if (module.install) {
-        module.install(context)
+        module.install()
     }
 }
 

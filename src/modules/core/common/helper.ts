@@ -1,5 +1,4 @@
-import * as vscode from 'vscode'
-
+import { getExtensionUri } from "../../../global"
 /**
  * A helper function that returns a unique alphanumeric identifier called a nonce.
  *
@@ -17,8 +16,9 @@ export function getNonce() {
     return text
 }
 
-import { ExtensionContext, Uri, Webview } from "vscode"
+import { ProgressLocation, Uri, Webview, commands, env, window } from "vscode"
 import { config } from '../../../config'
+import { getContext } from '../../../global'
 
 /**
  * A helper function which will get the webview URI of a given file or resource.
@@ -27,12 +27,11 @@ import { config } from '../../../config'
  * given file/resource.
  *
  * @param webview A reference to the extension webview
- * @param extensionUri The URI of the directory containing the extension
  * @param pathList An array of strings representing the path to a file/resource
  * @returns A URI pointing to the file/resource
  */
-export function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
-    return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList))
+export function getUri(webview: Webview, pathList: string[]) {
+    return webview.asWebviewUri(Uri.joinPath(getExtensionUri(), ...pathList))
 }
 
 export function makeStringUnique(name: string, names: string[]) {
@@ -51,14 +50,15 @@ export function makeStringUnique(name: string, names: string[]) {
     return name
 }
 
-export function registerCommand(name: string, context: ExtensionContext, callback: (...args: any[]) => any) {
-    context.subscriptions.push(vscode.commands.registerCommand(name, callback))
+export function registerCommand(name: string, callback: (...args: any[]) => any) {
+    getContext().subscriptions.push(commands.registerCommand(name, callback))
 }
 
-export function getIconDarkLightPaths(extensionUri: vscode.Uri, icon: string) {
+export function getIconDarkLightPaths(icon: string) {
+    const extensionUri = getExtensionUri()
     return {
-        light: vscode.Uri.joinPath(extensionUri, 'resources', 'light', icon),
-        dark: vscode.Uri.joinPath(extensionUri, 'resources', 'dark', icon)
+        light: Uri.joinPath(extensionUri, 'resources', 'light', icon),
+        dark: Uri.joinPath(extensionUri, 'resources', 'dark', icon)
     }
 }
 
@@ -72,16 +72,16 @@ export async function showMessage(message: string, timeout = 2000) {
 }
 
 async function showStatusBarMessage(message: string, timeout = 2000) {
-    const statusBarItem = vscode.window.setStatusBarMessage(message)
+    const statusBarItem = window.setStatusBarMessage(message)
     setTimeout(() => {
         statusBarItem.dispose()
     }, timeout)
 }
 
 async function showInformationMessage(message: string, timeout = 2000) {
-    vscode.window.withProgress(
+    window.withProgress(
         {
-            location: vscode.ProgressLocation.Notification,
+            location: ProgressLocation.Notification,
             title: message,
             cancellable: false,
         },
@@ -93,7 +93,7 @@ async function showInformationMessage(message: string, timeout = 2000) {
 }
 
 export function copyToClipboard(str: string) {
-    vscode.env.clipboard.writeText(str)
+    env.clipboard.writeText(str)
 }
 
 export function jsonStringify(value: any) {

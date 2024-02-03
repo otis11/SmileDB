@@ -1,9 +1,9 @@
-import { Uri, commands, window } from "vscode"
+import { commands, window } from "vscode"
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
+import { getConnectionClientModule, getIconDarkLightPaths, logError, refreshPoolConnection, storePoolConnectionConfig } from "../../common"
 import { PoolConnectionConfig } from "../../types"
-import { ExtensionStorage, getConnectionClientModule, getIconDarkLightPaths, logError, refreshPoolConnection, storePoolConnectionConfig } from "../../common"
 
-export function renderEditConnectionApp(extensionUri: Uri, config: PoolConnectionConfig, storage: ExtensionStorage) {
+export function renderEditConnectionApp(config: PoolConnectionConfig) {
     const id = `connection.edit.${config.id}`
     let app = getApp(id)
     if (app) {
@@ -16,13 +16,12 @@ export function renderEditConnectionApp(extensionUri: Uri, config: PoolConnectio
         title: config.id === -1 ? `New ${config.moduleName} Connection` : `Edit ${config.name}`,
         webviewPath: ['edit-connection'],
         onWebviewMessage,
-        iconPath: getIconDarkLightPaths(extensionUri, getConnectionClientModule(config.moduleName).icon),
+        iconPath: getIconDarkLightPaths(getConnectionClientModule(config.moduleName).icon),
         htmlBody: getHtmlBody(config),
-        storage,
         connectionConfig: config,
     }
 
-    renderWebviewApp(extensionUri, app)
+    renderWebviewApp(app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
@@ -47,10 +46,6 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
     }
     else if (command === 'connection.execute.save') {
         try {
-            if (!app.storage) {
-                logError('Webview App Storage is not defined.', app)
-                throw Error('Webview App Storage is not defined.')
-            }
             const authenticationClone = JSON.parse(JSON.stringify(payload.authentication))
             if (!authenticationClone.saveAuthentication) {
                 payload.authentication = {
@@ -60,14 +55,14 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
                     password: '',
                     username: ''
                 }
-                const id = storePoolConnectionConfig(payload, app.storage)
+                const id = storePoolConnectionConfig(payload)
                 refreshPoolConnection({
                     id,
                     ...payload,
                     authentication: authenticationClone,
                 })
             } else {
-                const id = storePoolConnectionConfig(payload, app.storage)
+                const id = storePoolConnectionConfig(payload)
                 refreshPoolConnection({
                     id,
                     ...payload,

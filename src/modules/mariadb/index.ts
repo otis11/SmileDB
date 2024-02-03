@@ -1,6 +1,6 @@
 import { config } from "../../config"
 import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
-import { MariaDBConnectionPool } from "./MariaDBConnectionPool"
+import { MySQLPoolConnection } from "../mysql/MySQLPoolConnection"
 import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mariadbModule: ConnectionClientModule = {
@@ -8,7 +8,7 @@ export const mariadbModule: ConnectionClientModule = {
     icon: 'mariadb.svg',
     iconActive: 'mariadb-active.svg',
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
-        return new MariaDBConnectionPool(config)
+        return new MySQLPoolConnection(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {

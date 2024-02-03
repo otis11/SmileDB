@@ -36,6 +36,7 @@ body {
 #error-message,
 #success-message {
     margin-left: 12px;
+    white-space: pre-wrap;
 }
 
 vscode-panel-view {

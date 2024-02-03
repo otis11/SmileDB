@@ -64,7 +64,38 @@ export class MySQLPoolConnection implements PoolConnection {
         const timer = new Timer()
         const queryResult = await this.query(`SELECT TABLE_NAME
                                             FROM information_schema.TABLES
-                                            WHERE TABLE_SCHEMA = '${this.config.connection.database}'`)
+                                            WHERE TABLE_SCHEMA = '${this.config.connection.database}'
+                                            AND TABLE_TYPE NOT LIKE 'VIEW'`)
+        return {
+            fields: [this.createQueryResultField(queryResult[1][0])],
+            rows: queryResult[0] as QueryResultRow[],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchDatabaseStats() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE NOT LIKE 'VIEW') as TotalTables,
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as TotalViews
+                                           `)
+        return {
+            fields: [this.createQueryResultField(queryResult[1][0])],
+            rows: queryResult[0] as QueryResultRow[],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchViews() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT TABLE_NAME
+                                            FROM information_schema.TABLES
+                                            WHERE TABLE_SCHEMA = '${this.config.connection.database}'
+                                            AND TABLE_TYPE LIKE 'VIEW'`)
         return {
             fields: [this.createQueryResultField(queryResult[1][0])],
             rows: queryResult[0] as QueryResultRow[],

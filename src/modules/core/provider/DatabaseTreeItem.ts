@@ -1,14 +1,13 @@
-import { TreeItem, TreeItemCollapsibleState, Uri } from "vscode"
-import { PoolConnectionConfig, QueryConfigBase } from "../types"
+import { TreeItem, TreeItemCollapsibleState } from "vscode"
 import { getIconDarkLightPaths } from "../common"
+import { PoolConnectionConfig } from "../types"
 
 export class DatabaseTreeItem extends TreeItem {
     constructor(
-        extensionUri: Uri,
         public connectionConfig: PoolConnectionConfig
     ) {
         super(connectionConfig.connection.database || '', TreeItemCollapsibleState.Collapsed)
         this.contextValue = "database"
-        this.iconPath = getIconDarkLightPaths(extensionUri, 'database.svg')
+        this.iconPath = getIconDarkLightPaths('database.svg')
     }
 }
