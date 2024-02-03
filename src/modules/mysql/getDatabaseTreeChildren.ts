@@ -19,15 +19,19 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
     }
 
     else if (item instanceof DatabaseTreeItem) {
+        const connection = getPoolConnection(item.connectionConfig) as MySQLPoolConnection
+        const { rows } = await connection.fetchDatabaseStats()
         return [
             new FolderTreeItem(
                 "tables",
                 "tableFolder",
-                item.connectionConfig),
+                item.connectionConfig,
+                rows[0].TotalTables?.toString()),
             new FolderTreeItem(
                 "views",
                 "viewFolder",
-                item.connectionConfig),
+                item.connectionConfig,
+                rows[0].TotalViews?.toString()),
         ]
     }
 

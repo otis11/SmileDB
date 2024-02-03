@@ -90,6 +90,21 @@ export class MariaDBConnectionPool implements PoolConnection {
         }
     }
 
+    async fetchDatabaseStats() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE NOT LIKE 'VIEW') as TotalTables,
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as TotalViews
+                                           `)
+        return {
+            fields: [this.createQueryResultField(queryResult[1][0])],
+            rows: queryResult[0] as QueryResultRow[],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
     private createOrderBy(configOrderBy?: OrderByConfig) {
         let orderBy = ''
         if (!configOrderBy) {
