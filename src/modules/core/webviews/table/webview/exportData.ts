@@ -1,36 +1,36 @@
-import { logError, logWarn } from "../../webview-helper/logger";
-import { QueryResult } from "../../../types";
-import { openPopup } from "./popup";
-import { getQueryResult } from "./query";
-import { vscode } from "../../webview-helper/vscode";
-import { getConnectionConfig } from "../../webview-helper/connectionConfig";
-import { setLoading } from "./loading";
-import { copyToClipboard } from "../../webview-helper/copyToClipboard";
+import { QueryResult } from "../../../types"
+import { getConnectionConfig } from "../../webview-helper/connectionConfig"
+import { copyToClipboard } from "../../webview-helper/copyToClipboard"
+import { logWarn } from "../../webview-helper/logger"
+import { vscode } from "../../webview-helper/vscode"
+import { setLoading } from "./loading"
+import { openPopup } from "./popup"
+import { getQueryResult } from "./query"
 
-type ExportDataFormat = 'CSV' | 'TXT';
-type ExportDataScope = 'current' | 'complete';
-const exportDataElement = document.getElementById('export-data');
+type ExportDataFormat = 'CSV' | 'TXT'
+type ExportDataScope = 'current' | 'complete'
+const exportDataElement = document.getElementById('export-data')
 const updatePreviewChangeListenerIds = [
     'export-add-row-header',
     'export-add-column-header',
     'export-data-format',
-];
-let exportDataPreviewRowsCount = 5;
-let exportDataSeparator = ',';
+]
+const exportDataPreviewRowsCount = 5
+let exportDataSeparator = ','
 export const exportDataSeparatorDefaults: Record<ExportDataFormat, string> = {
     CSV: ',',
     TXT: '    ',
-};
-let completeDatabase: null | QueryResult = null;
+}
+let completeDatabase: null | QueryResult = null
 
 export function setCompleteDatabaseExport(data: QueryResult) {
-    completeDatabase = data;
+    completeDatabase = data
 }
 
-exportDataElement?.addEventListener('click', openExportDataPopup);
+exportDataElement?.addEventListener('click', openExportDataPopup)
 
 function openExportDataPopup() {
-    const data = getQueryResult();
+    const data = getQueryResult()
     openPopup(`
             <h2>Export Data</h2>
             <div class="flex-row">
@@ -74,74 +74,74 @@ function openExportDataPopup() {
                 <vscode-button id="export-copy-to-clipboard" appearance="secondary">Copy to Clipboard</vscode-button>
                 <vscode-button id="export-save-to-file" class="ml-3" disabled>Save to File</vscode-button>
             </div>
-        `);
+        `)
     requestAnimationFrame(() => {
-        addExportDataEventListeners();
+        addExportDataEventListeners()
         updateExportDataPreview();
-        (document.getElementById('export-separator') as HTMLInputElement).value = exportDataSeparator;
-    });
+        (document.getElementById('export-separator') as HTMLInputElement).value = exportDataSeparator
+    })
 }
 
 function updateExportDataPreview() {
-    const previewElement = document.getElementById('export-preview') as HTMLTextAreaElement;
-    previewElement.value = createExportDataString(exportDataPreviewRowsCount);
+    const previewElement = document.getElementById('export-preview') as HTMLTextAreaElement
+    previewElement.value = createExportDataString(exportDataPreviewRowsCount)
 }
 
 export function updateExportDataFolderLocation(folderPath: string | null) {
     if (folderPath !== null) {
-        const conn = getConnectionConfig();
+        const conn = getConnectionConfig()
         const format = (document.getElementById('export-data-format') as HTMLInputElement).value.toLowerCase();
-        (document.getElementById('export-folder-path') as HTMLInputElement).value = folderPath + `/${conn?.connection.database}.${format}`;
+        (document.getElementById('export-folder-path') as HTMLInputElement).value = folderPath + `/${conn?.connection.database}.${format}`
         // @ts-ignore
-        document.getElementById('export-save-to-file').disabled = false;
+        document.getElementById('export-save-to-file').disabled = false
     }
 }
 
 function createExportDataString(rowCount: number) {
-    const addRowHeader = (document.getElementById('export-add-row-header') as HTMLInputElement).checked;
-    const addColumnHeader = (document.getElementById('export-add-column-header') as HTMLInputElement).checked;
-    const exportDataFormat = (document.getElementById('export-data-format') as HTMLInputElement).value;
-    const exportDataScope = (document.getElementById('export-which-data') as HTMLInputElement).value as ExportDataScope;
-    let data = getQueryResult();
+    const addRowHeader = (document.getElementById('export-add-row-header') as HTMLInputElement).checked
+    const addColumnHeader = (document.getElementById('export-add-column-header') as HTMLInputElement).checked
+    const exportDataFormat = (document.getElementById('export-data-format') as HTMLInputElement).value
+    const exportDataScope = (document.getElementById('export-which-data') as HTMLInputElement).value as ExportDataScope
+    let data = getQueryResult()
     if (!data) {
-        return '';
+        return ''
     }
     if (exportDataScope === 'complete') {
-        data = completeDatabase as QueryResult;
+        data = completeDatabase as QueryResult
     }
 
-    const maxRowCount = Math.min(rowCount, data.rows.length);
+    const maxRowCount = Math.min(rowCount, data.rows.length)
     if (exportDataFormat === 'CSV') {
-        return exportDataFormatCSV(data, addRowHeader, addColumnHeader, maxRowCount);
+        return exportDataFormatCSV(data, addRowHeader, addColumnHeader, maxRowCount)
     }
     else if (exportDataFormat === 'TXT') {
-        return exportDataFormatTXT(data, addRowHeader, addColumnHeader, maxRowCount);
+        return exportDataFormatTXT(data, addRowHeader, addColumnHeader, maxRowCount)
     }
     else {
-        logWarn('exportDataPreview unknown format', exportDataFormat);
-        return '';
+        logWarn('exportDataPreview unknown format', exportDataFormat)
+        return ''
     }
 }
 
 function addExportDataEventListeners() {
     document.getElementById('export-data-format')?.addEventListener('change', (e: any) => {
         exportDataSeparator = exportDataSeparatorDefaults[e.target.value as ExportDataFormat];
-        (document.getElementById('export-separator') as HTMLInputElement).value = exportDataSeparator;
-    });
+        (document.getElementById('export-separator') as HTMLInputElement).value = exportDataSeparator
+    })
     document.getElementById('export-separator')?.addEventListener('input', (e: any) => {
-        exportDataSeparator = (document.getElementById('export-separator') as HTMLInputElement).value;
-        updateExportDataPreview();
-    });
+        exportDataSeparator = (document.getElementById('export-separator') as HTMLInputElement).value
+        updateExportDataPreview()
+    })
 
     document.getElementById('export-folder-path-icon')?.addEventListener('click', (e) => {
         vscode.postMessage({
             command: 'export.chooseLocation',
-        });
-    });
+        })
+    })
 
     document.getElementById('export-copy-to-clipboard')?.addEventListener('click', () => {
-        copyToClipboard(createExportDataString(Number.MAX_SAFE_INTEGER));
-    });
+        copyToClipboard(createExportDataString(Number.MAX_SAFE_INTEGER))
+    })
 
     document.getElementById('export-save-to-file')?.addEventListener('click', () => {
         vscode.postMessage({
@@ -150,64 +150,64 @@ function addExportDataEventListeners() {
                 data: createExportDataString(Number.MAX_SAFE_INTEGER),
                 path: (document.getElementById('export-folder-path') as HTMLInputElement).value
             }
-        });
-    });
+        })
+    })
 
     document.getElementById('export-which-data')?.addEventListener('change', (e) => {
-        const exportDataScope = (e.target as HTMLInputElement).value as ExportDataScope;
+        const exportDataScope = (e.target as HTMLInputElement).value as ExportDataScope
         if (exportDataScope === 'complete' && completeDatabase === null) {
             vscode.postMessage({
                 command: 'export.load.completeDatabase',
-            });
-            setLoading(true);
+            })
+            setLoading(true)
         }
-    });
+    })
 
     for (let i = 0; i < updatePreviewChangeListenerIds.length; i++) {
-        document.getElementById(updatePreviewChangeListenerIds[i])?.addEventListener('change', updateExportDataPreview);
+        document.getElementById(updatePreviewChangeListenerIds[i])?.addEventListener('change', updateExportDataPreview)
     }
 }
 
 function removeExportDataEventListeners() {
     for (let i = 0; i < updatePreviewChangeListenerIds.length; i++) {
-        document.getElementById(updatePreviewChangeListenerIds[i])?.removeEventListener('change', updateExportDataPreview);
+        document.getElementById(updatePreviewChangeListenerIds[i])?.removeEventListener('change', updateExportDataPreview)
     }
 }
 
 
 function exportDataFormatCSV(data: QueryResult, addRowHeader: boolean, addColumnHeader: boolean, rowsCount: number) {
-    let content = '';
+    let content = ''
     if (addRowHeader) {
         if (addColumnHeader) {
-            content += 'row_number' + exportDataSeparator;
+            content += 'row_number' + exportDataSeparator
         }
-        content += data.fields.map(field => field.name).join(exportDataSeparator) + '\n';
+        content += data.fields.map(field => field.name).join(exportDataSeparator) + '\n'
     }
     for (let i = 0; i < rowsCount; i++) {
         if (addColumnHeader) {
-            content += `${i + 1}${exportDataSeparator}`;
+            content += `${i + 1}${exportDataSeparator}`
         }
         content += data.fields.map(field => {
-            const value = data.rows[i][field.name];
+            const value = data.rows[i][field.name]
             if (value?.toString().includes(',')) {
-                return `"${value}"`;
+                return `"${value}"`
             }
-            return value;
-        }).join(exportDataSeparator) + '\n';
+            return value
+        }).join(exportDataSeparator) + '\n'
     }
-    return content.trim();
+    return content.trim()
 }
 
 function exportDataFormatTXT(data: QueryResult, addRowHeader: boolean, addColumnHeader: boolean, rowsCount: number) {
-    let content = '';
+    let content = ''
     if (addRowHeader) {
-        content += data.fields.map(field => field.name).join(exportDataSeparator) + '\n';
+        content += data.fields.map(field => field.name).join(exportDataSeparator) + '\n'
     }
     for (let i = 0; i < rowsCount; i++) {
         if (addColumnHeader) {
-            content += `${i + 1}${exportDataSeparator}`;
+            content += `${i + 1}${exportDataSeparator}`
         }
-        content += data.fields.map(field => data.rows[i][field.name]).join(exportDataSeparator) + '\n';
+        content += data.fields.map(field => data.rows[i][field.name]).join(exportDataSeparator) + '\n'
     }
-    return content.trim();
+    return content.trim()
 }

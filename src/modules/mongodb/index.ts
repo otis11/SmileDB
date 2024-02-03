@@ -1,16 +1,14 @@
-import { ExtensionContext } from "vscode";
-import { MongoDBPoolConnection } from "./MongoDBPoolConnection";
-import { ConnectionClientModule, PoolConnectionConfig } from "../core";
-import { config } from "../../config";
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren";
+import { config } from "../../config"
+import { ConnectionClientModule, PoolConnectionConfig } from "../core"
+import { MongoDBPoolConnection } from "./MongoDBPoolConnection"
+import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mongodbModule: ConnectionClientModule = {
     name: 'MongoDB',
     icon: 'mongodb.svg',
     iconActive: 'mongodb-active.svg',
-    install(context: ExtensionContext) { },
     createPoolConnection(config: PoolConnectionConfig) {
-        return new MongoDBPoolConnection(config);
+        return new MongoDBPoolConnection(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {
@@ -47,4 +45,4 @@ export const mongodbModule: ConnectionClientModule = {
             }
         }
     },
-};
+}

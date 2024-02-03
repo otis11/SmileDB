@@ -1,20 +1,20 @@
-import { Uri, commands, window, workspace } from "vscode";
-import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
-import { config } from "../../../../config";
-import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common";
-import { PoolConnectionConfig } from "../../types";
-import { writeFileSync } from "fs";
+import { writeFileSync } from "fs"
+import { Uri, commands, window, workspace } from "vscode"
+import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
+import { config } from "../../../../config"
+import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common"
+import { PoolConnectionConfig } from "../../types"
 
 export function renderTableApp(
     extensionUri: Uri,
     config: PoolConnectionConfig,
     table: string,
 ) {
-    const id = `table.${config.moduleName}.${config.connection.schema}.${config.connection.database}.${table}`;
-    let app = getApp(id);
+    const id = `table.${config.moduleName}.${config.connection.schema}.${config.connection.database}.${table}`
+    let app = getApp(id)
     if (app) {
-        app.panel?.reveal();
-        return;
+        app.panel?.reveal()
+        return
     }
 
     app = {
@@ -26,18 +26,18 @@ export function renderTableApp(
         htmlBody: getHtmlBody(config),
         connectionConfig: config,
         table,
-    };
+    }
 
-    renderWebviewApp(extensionUri, app);
+    renderWebviewApp(extensionUri, app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
     if (!app.connectionConfig) {
-        logWarn('Invalid State: Table App has no connection config and received a webview message', app);
-        return;
+        logWarn('Invalid State: Table App has no connection config and received a webview message', app)
+        return
     }
 
-    const { command, payload } = message;
+    const { command, payload } = message
     const queryConfig = {
         table: app.table,
         database: app.connectionConfig.connection.database,
@@ -46,68 +46,68 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
         pageResultsLimit: payload?.pageResultsLimit,
         filterString: payload?.filterString,
         orderBy: payload?.orderBy,
-    };
+    }
 
-    const connection = getPoolConnection(app.connectionConfig);
+    const connection = getPoolConnection(app.connectionConfig)
 
     if (command === "query.execute.fetch") {
         try {
-            const data = await connection.executeQueriesAndFetch([], queryConfig);
-            app.panel?.webview.postMessage({ command: `query.execute.fetch.result`, payload: data });
+            const data = await connection.executeQueriesAndFetch([], queryConfig)
+            app.panel?.webview.postMessage({ command: `query.execute.fetch.result`, payload: data })
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `query.execute.fetch.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `query.execute.fetch.error`, payload: e.message })
         }
     }
 
     if (command === "query.execute.rawQuery") {
         try {
-            const data = await connection.executeQuery(payload.rawQuery);
-            app.panel?.webview.postMessage({ command: `query.execute.rawQuery.result`, payload: data });
+            const data = await connection.executeQuery(payload.rawQuery)
+            app.panel?.webview.postMessage({ command: `query.execute.rawQuery.result`, payload: data })
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `query.execute.rawQuery.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `query.execute.rawQuery.error`, payload: e.message })
         }
     }
 
     if (command === "query.execute.update") {
         try {
-            const queries = connection.buildQueriesUpdate(payload.updates, queryConfig);
-            const result = await connection.executeQueriesAndFetch(queries, queryConfig);
-            app.panel?.webview.postMessage({ command: `query.execute.update.result`, payload: result });
-            showMessage('Changes applied');
+            const queries = connection.buildQueriesUpdate(payload.updates, queryConfig)
+            const result = await connection.executeQueriesAndFetch(queries, queryConfig)
+            app.panel?.webview.postMessage({ command: `query.execute.update.result`, payload: result })
+            showMessage('Changes applied')
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `query.execute.update.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `query.execute.update.error`, payload: e.message })
         }
 
     }
 
     if (command === "query.execute.delete") {
         try {
-            const queries = connection.buildQueriesDelete(payload.deletes, queryConfig);
-            const result = await connection.executeQueriesAndFetch(queries, queryConfig);
-            app.panel?.webview.postMessage({ command: `query.execute.delete.result`, payload: result });
-            showMessage('Deletions applied');
+            const queries = connection.buildQueriesDelete(payload.deletes, queryConfig)
+            const result = await connection.executeQueriesAndFetch(queries, queryConfig)
+            app.panel?.webview.postMessage({ command: `query.execute.delete.result`, payload: result })
+            showMessage('Deletions applied')
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `query.execute.delete.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `query.execute.delete.error`, payload: e.message })
         }
     }
 
     if (command === "query.execute.insert") {
         try {
-            const queries = connection.buildQueriesInsert(payload.insertions, queryConfig);
-            const result = await connection.executeQueriesAndFetch(queries, queryConfig);
-            app.panel?.webview.postMessage({ command: `query.execute.insert.result`, payload: result });
-            showMessage('Inserts applied');
+            const queries = connection.buildQueriesInsert(payload.insertions, queryConfig)
+            const result = await connection.executeQueriesAndFetch(queries, queryConfig)
+            app.panel?.webview.postMessage({ command: `query.execute.insert.result`, payload: result })
+            showMessage('Inserts applied')
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `query.execute.insert.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `query.execute.insert.error`, payload: e.message })
         }
     }
 
     if (command === "query.execute.preview") {
         try {
-            const queriesInsert = connection.buildQueriesInsert(payload.insertions || { insertions: [], fields: [] }, queryConfig);
-            const queriesFetch = connection.buildQueriesFetch(queryConfig);
-            const queriesDelete = connection.buildQueriesDelete(payload.deletes || [], queryConfig);
-            const queriesUpdate = connection.buildQueriesUpdate(payload.updates || [], queryConfig);
+            const queriesInsert = connection.buildQueriesInsert(payload.insertions || { insertions: [], fields: [] }, queryConfig)
+            const queriesFetch = connection.buildQueriesFetch(queryConfig)
+            const queriesDelete = connection.buildQueriesDelete(payload.deletes || [], queryConfig)
+            const queriesUpdate = connection.buildQueriesUpdate(payload.updates || [], queryConfig)
             app.panel?.webview.postMessage({
                 command: `query.execute.preview.result`, payload: {
                     queriesDelete,
@@ -115,22 +115,22 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
                     queriesInsert,
                     queriesUpdate,
                 }
-            });
+            })
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `query.execute.preview.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `query.execute.preview.error`, payload: e.message })
         }
     }
 
     if (command === "load.connectionConfig") {
-        app.panel?.webview.postMessage({ command: `load.connectionConfig`, payload: app.connectionConfig });
+        app.panel?.webview.postMessage({ command: `load.connectionConfig`, payload: app.connectionConfig })
     }
 
     if (command === "load.config") {
-        app.panel?.webview.postMessage({ command: `load.config`, payload: config });
+        app.panel?.webview.postMessage({ command: `load.config`, payload: config })
     }
 
     if (command === "workbench.action.openSettings") {
-        commands.executeCommand(command, payload);
+        commands.executeCommand(command, payload)
     }
 
     if (command === "export.chooseLocation") {
@@ -139,25 +139,25 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
             canSelectMany: false,
             canSelectFolders: true,
             canSelectFiles: false,
-        });
+        })
 
-        const path = files ? files[0].path : null;
-        app.panel?.webview.postMessage({ command: `export.chooseLocation.result`, payload: path });
+        const path = files ? files[0].path : null
+        app.panel?.webview.postMessage({ command: `export.chooseLocation.result`, payload: path })
     }
 
     if (command === "copy.toClipboard") {
-        copyToClipboard(message.payload);
+        copyToClipboard(message.payload)
     }
 
     if (command === "export.save.toFile") {
         try {
-            writeFileSync(message.payload.path, message.payload.data, 'utf-8');
+            writeFileSync(message.payload.path, message.payload.data, 'utf-8')
             workspace.openTextDocument(message.payload.path).then(doc => {
-                window.showTextDocument(doc);
-            });
-            app.panel?.webview.postMessage({ command: `export.save.toFile.result` });
+                window.showTextDocument(doc)
+            })
+            app.panel?.webview.postMessage({ command: `export.save.toFile.result` })
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `export.save.toFile.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `export.save.toFile.error`, payload: e.message })
         }
     }
 
@@ -167,10 +167,10 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
                 ...queryConfig,
                 page: 0,
                 pageResultsLimit: Number.MAX_SAFE_INTEGER,
-            });
-            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.result`, payload: data });
+            })
+            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.result`, payload: data })
         } catch (e: any) {
-            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.error`, payload: e.message });
+            app.panel?.webview.postMessage({ command: `export.load.completeDatabase.error`, payload: e.message })
         }
     }
 }
@@ -258,6 +258,6 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
         <div class="select-option" id="table-selection-context-menu-select-column">Select Column</div>
         <div class="select-option" id="table-selection-context-menu-select-all">Select All</div>
     </div>
-`;
+`
 }
 

@@ -5,21 +5,21 @@ export type ShortcutRegister = {
         [key: string]: boolean
     },
     callback: () => any
-};
+}
 
 export function registerShortcuts(shortcutRegisters: ShortcutRegister[]) {
-    const pressedKeys: { [key: string]: boolean } = {};
+    const pressedKeys: { [key: string]: boolean } = {}
     document.addEventListener('keydown', (e: KeyboardEvent) => {
-        pressedKeys[e.key] = true;
+        pressedKeys[e.key] = true
         const shortcutRegister = shortcutRegisters.find(register => {
-            return Object.keys(register.keys).filter(key => !pressedKeys[key]).length === 0;
-        });
+            return Object.keys(register.keys).filter(key => !pressedKeys[key]).length === 0
+        })
         if (shortcutRegister) {
-            shortcutRegister.callback();
+            shortcutRegister.callback()
         }
-    });
+    })
 
     document.addEventListener('keyup', (e: KeyboardEvent) => {
-        pressedKeys[e.key] = false;
-    });
+        pressedKeys[e.key] = false
+    })
 }

@@ -1,7 +1,7 @@
-import { addSelectedRowsToDeletion } from "./tableSelectionMode";
+import { addSelectedRowsToDeletion } from "./tableSelectionMode"
 
-const deleteRowsElement = document.getElementById('delete-rows');
+const deleteRowsElement = document.getElementById('delete-rows')
 
 export function renderDeleteRows() {
-    deleteRowsElement?.addEventListener('click', addSelectedRowsToDeletion);
+    deleteRowsElement?.addEventListener('click', addSelectedRowsToDeletion)
 }

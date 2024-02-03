@@ -1,23 +1,23 @@
-import { provideVSCodeDesignSystem, vsCodeButton, vsCodeCheckbox, vsCodeDivider, vsCodeDropdown, vsCodeOption, vsCodeRadio, vsCodeRadioGroup, vsCodeTextArea, vsCodeTextField } from "@vscode/webview-ui-toolkit";
-import { onConfigLoad } from "../../webview-helper/config";
-import { onConnectionConfigLoad } from "../../webview-helper/connectionConfig";
-import { registerShortcuts } from "../../webview-helper/registerShortcuts";
-import { vscode } from "../../webview-helper/vscode";
-import { renderAddRow } from "./addRow";
-import { renderDeleteRows } from "./deleteRows";
-import { removeErrorMessage, showErrorMessage } from "./error";
-import { renderFilterInput, renderFilterOptions, setActiveFilterAndFocus } from "./filter";
-import { setLoading } from "./loading";
-import { setTableRowsOriginal } from "./orderBy";
-import { renderPagination, renderPaginationSelect, setPageResultsLimit, updatePagination } from "./pagination";
-import "./popup";
-import "./exportData";
-import { onPushChangesClick, renderPushChanges, updateOnPushChangesState, updatePushChangesLoadingState } from "./push";
-import { getQueryResult, openQueriesPreview, requestExecuteQueryFetch, setQueryResult, setQueryResultChanges, setQueryResultDeletions, setQueryResultInsertions, setQueryResultTimeInMilliseconds, updateQueryTimeInMilliseconds } from "./query";
-import { renderTable, renderTableResult } from "./table";
-import { copySelectedColumns, renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode";
-import { setCompleteDatabaseExport, updateExportDataFolderLocation } from "./exportData";
-import { closePopup } from "./popup";
+import { provideVSCodeDesignSystem, vsCodeButton, vsCodeCheckbox, vsCodeDivider, vsCodeDropdown, vsCodeOption, vsCodeRadio, vsCodeRadioGroup, vsCodeTextArea, vsCodeTextField } from "@vscode/webview-ui-toolkit"
+import { onConfigLoad } from "../../webview-helper/config"
+import { onConnectionConfigLoad } from "../../webview-helper/connectionConfig"
+import { registerShortcuts } from "../../webview-helper/registerShortcuts"
+import { vscode } from "../../webview-helper/vscode"
+import { renderAddRow } from "./addRow"
+import { renderDeleteRows } from "./deleteRows"
+import { removeErrorMessage, showErrorMessage } from "./error"
+import "./exportData"
+import { setCompleteDatabaseExport, updateExportDataFolderLocation } from "./exportData"
+import { renderFilterInput, renderFilterOptions, setActiveFilterAndFocus } from "./filter"
+import { setLoading } from "./loading"
+import { setTableRowsOriginal } from "./orderBy"
+import { renderPagination, renderPaginationSelect, setPageResultsLimit, updatePagination } from "./pagination"
+import "./popup"
+import { closePopup } from "./popup"
+import { onPushChangesClick, renderPushChanges, updateOnPushChangesState, updatePushChangesLoadingState } from "./push"
+import { getQueryResult, openQueriesPreview, requestExecuteQueryFetch, setQueryResult, setQueryResultChanges, setQueryResultDeletions, setQueryResultInsertions, setQueryResultTimeInMilliseconds, updateQueryTimeInMilliseconds } from "./query"
+import { renderTable, renderTableResult } from "./table"
+import { copySelectedColumns, renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode"
 
 provideVSCodeDesignSystem().register(
     vsCodeButton(),
@@ -29,111 +29,109 @@ provideVSCodeDesignSystem().register(
     vsCodeTextField(),
     vsCodeRadio(),
     vsCodeRadioGroup()
-);
+)
 
-let reloadElement: HTMLElement | null;
+const reloadElement = document.getElementById("reload") as HTMLElement
 
 window.addEventListener('message', event => {
-    removeErrorMessage();
-    const message = event.data;
+    removeErrorMessage()
+    const message = event.data
 
     if (message.command === "query.execute.fetch.result") {
-        setQueryResultChanges({});
-        setQueryResultDeletions([]);
-        setQueryResultInsertions({});
-        setQueryResult(message.payload);
-        updatePagination(getQueryResult()?.stats.rowCount || 0);
-        renderTableResult();
-        setLoading(false);
-        setTableRowsOriginal(null);
+        setQueryResultChanges({})
+        setQueryResultDeletions([])
+        setQueryResultInsertions({})
+        setQueryResult(message.payload)
+        updatePagination(getQueryResult()?.stats.rowCount || 0)
+        renderTableResult()
+        setLoading(false)
+        setTableRowsOriginal(null)
     }
 
     if (message.command === "query.execute.preview.result") {
-        openQueriesPreview(message.payload);
+        openQueriesPreview(message.payload)
     }
 
     if (message.command === "query.execute.rawQuery.result") {
-        setQueryResultChanges({});
-        setQueryResultDeletions([]);
-        setQueryResultInsertions({});
-        setQueryResult(message.payload);
-        updatePagination(getQueryResult()?.rows?.length || 0, true);
-        renderTableResult();
-        setLoading(false);
-        setTableRowsOriginal(null);
+        setQueryResultChanges({})
+        setQueryResultDeletions([])
+        setQueryResultInsertions({})
+        setQueryResult(message.payload)
+        updatePagination(getQueryResult()?.rows?.length || 0, true)
+        renderTableResult()
+        setLoading(false)
+        setTableRowsOriginal(null)
     }
 
     if (message.command === "query.execute.update.result") {
-        updatePushChangesLoadingState(false);
+        updatePushChangesLoadingState(false)
         // clear data changes, as its a new page with new data
-        setQueryResultChanges({});
-        setQueryResult(message.payload);
-        updatePagination(getQueryResult()?.stats.rowCount || 0);
-        renderTableResult();
+        setQueryResultChanges({})
+        setQueryResult(message.payload)
+        updatePagination(getQueryResult()?.stats.rowCount || 0)
+        renderTableResult()
     }
 
     if (message.command.includes('error')) {
-        setTableRowsOriginal(null);
-        setLoading(false);
-        updatePushChangesLoadingState(false);
-        showErrorMessage(`[${message.command}] Failed\n"${message.payload}`);
-        setQueryResultTimeInMilliseconds(0);
+        setTableRowsOriginal(null)
+        setLoading(false)
+        updatePushChangesLoadingState(false)
+        showErrorMessage(`[${message.command}] Failed\n"${message.payload}`)
+        setQueryResultTimeInMilliseconds(0)
     }
 
     if (message.command === "query.execute.insert.result") {
-        updatePushChangesLoadingState(false);
+        updatePushChangesLoadingState(false)
         // clear data changes, as its a new page with new data
-        setQueryResultInsertions({});
-        setQueryResult(message.payload);
-        updatePagination(getQueryResult()?.stats.rowCount || 0);
-        renderTableResult();
+        setQueryResultInsertions({})
+        setQueryResult(message.payload)
+        updatePagination(getQueryResult()?.stats.rowCount || 0)
+        renderTableResult()
     }
 
     if (message.command === "query.execute.delete.result") {
-        updatePushChangesLoadingState(false);
-        setQueryResultDeletions([]);
-        setQueryResultChanges({});
-        setQueryResult(message.payload);
-        updatePagination(getQueryResult()?.stats.rowCount || 0);
-        renderTableResult();
+        updatePushChangesLoadingState(false)
+        setQueryResultDeletions([])
+        setQueryResultChanges({})
+        setQueryResult(message.payload)
+        updatePagination(getQueryResult()?.stats.rowCount || 0)
+        renderTableResult()
     }
 
     if (message.command === 'export.chooseLocation.result') {
-        updateExportDataFolderLocation(message.payload);
+        updateExportDataFolderLocation(message.payload)
     }
 
     if (message.command === 'export.load.completeDatabase.result') {
-        setCompleteDatabaseExport(message.payload);
-        setLoading(false);
+        setCompleteDatabaseExport(message.payload)
+        setLoading(false)
     }
 
     if (message.command === 'export.save.toFile.result') {
-        closePopup();
+        closePopup()
     }
 
-    updateOnPushChangesState();
-    updateQueryTimeInMilliseconds();
-    updateSelectionMode();
-});
+    updateOnPushChangesState()
+    updateQueryTimeInMilliseconds()
+    updateSelectionMode()
+})
 
-
-reloadElement = document.getElementById("reload");
 
 onConfigLoad((config => {
-    setPageResultsLimit(config.table.pageResultsLimit);
-    renderPaginationSelect(config.table.pageResultsLimitOptions);
-    requestExecuteQueryFetch();
-    setEditMode(config.table.defaultEditMode);
-}));
-onConnectionConfigLoad(renderFilterOptions);
-renderPagination();
-renderTable();
-renderPushChanges();
-renderReload();
-renderFilterInput();
-renderSelectionMode();
-renderAddRow();
-renderDeleteRows();
+    setPageResultsLimit(config.table.pageResultsLimit)
+    renderPaginationSelect(config.table.pageResultsLimitOptions)
+    requestExecuteQueryFetch()
+    setEditMode(config.table.defaultEditMode)
+}))
+onConnectionConfigLoad(renderFilterOptions)
+renderPagination()
+renderTable()
+renderPushChanges()
+renderReload()
+renderFilterInput()
+renderSelectionMode()
+renderAddRow()
+renderDeleteRows()
 registerShortcuts([
     {
         keys: {
@@ -184,20 +182,17 @@ registerShortcuts([
         },
         callback: copySelectedColumns
     }
-]);
+])
 
 function renderReload() {
-    if (!reloadElement) {
-        return;
-    };
     reloadElement.onclick = () => {
-        requestExecuteQueryFetch();
-    };
+        requestExecuteQueryFetch()
+    }
 }
 
 document.getElementById('settings')?.addEventListener('click', () => {
     vscode.postMessage({
         command: 'workbench.action.openSettings',
         payload: 'SmileDB.table'
-    });
-});
+    })
+})

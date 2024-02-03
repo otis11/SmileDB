@@ -1,16 +1,14 @@
-import { ExtensionContext } from "vscode";
-import { RedisPoolConnection } from "./RedisPoolConnection";
-import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core";
-import { config } from "../../config";
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren";
+import { config } from "../../config"
+import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
+import { RedisPoolConnection } from "./RedisPoolConnection"
+import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const redisModule: ConnectionClientModule = {
     name: 'Redis',
     icon: 'redis.svg',
     iconActive: 'redis-active.svg',
-    install(context: ExtensionContext) { },
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
-        return new RedisPoolConnection(config);
+        return new RedisPoolConnection(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {
@@ -45,5 +43,5 @@ export const redisModule: ConnectionClientModule = {
             }
         },
     },
-};
+}
 

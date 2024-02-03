@@ -1,16 +1,14 @@
-import { ExtensionContext } from "vscode";
-import { MariaDBConnectionPool } from "./MariaDBConnectionPool";
-import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core";
-import { config } from "../../config";
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren";
+import { config } from "../../config"
+import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
+import { MariaDBConnectionPool } from "./MariaDBConnectionPool"
+import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mariadbModule: ConnectionClientModule = {
     name: 'MariaDB',
     icon: 'mariadb.svg',
     iconActive: 'mariadb-active.svg',
-    install(context: ExtensionContext) { },
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
-        return new MariaDBConnectionPool(config);
+        return new MariaDBConnectionPool(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {
@@ -47,4 +45,4 @@ export const mariadbModule: ConnectionClientModule = {
             }
         },
     },
-};
+}

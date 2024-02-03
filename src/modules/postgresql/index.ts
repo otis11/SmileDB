@@ -1,16 +1,14 @@
-import { ExtensionContext } from "vscode";
-import { PostgreSQLPoolConnection } from "./PostgreSQLPoolConnection";
-import { ConnectionClientModule, PoolConnectionConfig } from "../core";
-import { config } from "../../config";
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren";
+import { config } from "../../config"
+import { ConnectionClientModule, PoolConnectionConfig } from "../core"
+import { PostgreSQLPoolConnection } from "./PostgreSQLPoolConnection"
+import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const postgresModule: ConnectionClientModule = {
     name: 'PostgreSQL',
     icon: 'postgresql.svg',
     iconActive: 'postgresql-active.svg',
-    install(context: ExtensionContext) { },
     createPoolConnection(config: PoolConnectionConfig) {
-        return new PostgreSQLPoolConnection(config);
+        return new PostgreSQLPoolConnection(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {
@@ -47,4 +45,4 @@ export const postgresModule: ConnectionClientModule = {
             }
         }
     },
-};
+}

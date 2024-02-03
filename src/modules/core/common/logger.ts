@@ -1,4 +1,4 @@
-import { config } from '../../../config';
+import { config } from '../../../config'
 
 export enum LogLevel {
     debug = 0,
@@ -12,39 +12,39 @@ function log(logLevel: LogLevel, ...args: any[]) {
         console.log(
             getLogLevelColor(logLevel) + LogLevel[logLevel].toUpperCase() + ' \x1b[0m',
             ...args
-        );
+        )
     }
 }
 
 function getLogLevelColor(logLevel: LogLevel) {
     if (logLevel === LogLevel.info) {
         // blue
-        return '\x1b[34m ';
+        return '\x1b[34m '
     }
     if (logLevel === LogLevel.warn) {
         // yellow
-        return '\x1b[33m ';
+        return '\x1b[33m '
     }
     if (logLevel === LogLevel.error) {
         // red
-        return '\x1b[31m ';
+        return '\x1b[31m '
     }
     // gray, debug
-    return '\x1b[90m';
+    return '\x1b[90m'
 }
 
 export function logDebug(...args: any[]) {
-    log(LogLevel.debug, ...args);
+    log(LogLevel.debug, ...args)
 }
 
 export function logInfo(...args: any[]) {
-    log(LogLevel.info, ...args);
+    log(LogLevel.info, ...args)
 }
 
 export function logWarn(...args: any[]) {
-    log(LogLevel.warn, ...args);
+    log(LogLevel.warn, ...args)
 }
 
 export function logError(...args: any[]) {
-    log(LogLevel.error, ...args);
+    log(LogLevel.error, ...args)
 }

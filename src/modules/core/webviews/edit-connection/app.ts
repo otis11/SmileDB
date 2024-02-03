@@ -1,14 +1,14 @@
-import { Uri, commands, window } from "vscode";
-import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
-import { PoolConnectionConfig } from "../../types";
-import { ExtensionStorage, getConnectionClientModule, getIconDarkLightPaths, logError, refreshPoolConnection, storePoolConnectionConfig } from "../../common";
+import { Uri, commands, window } from "vscode"
+import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
+import { PoolConnectionConfig } from "../../types"
+import { ExtensionStorage, getConnectionClientModule, getIconDarkLightPaths, logError, refreshPoolConnection, storePoolConnectionConfig } from "../../common"
 
 export function renderEditConnectionApp(extensionUri: Uri, config: PoolConnectionConfig, storage: ExtensionStorage) {
-    const id = `connection.edit.${config.id}`;
-    let app = getApp(id);
+    const id = `connection.edit.${config.id}`
+    let app = getApp(id)
     if (app) {
         // close old edit connection panel
-        app.panel?.dispose();
+        app.panel?.dispose()
     }
 
     app = {
@@ -20,38 +20,38 @@ export function renderEditConnectionApp(extensionUri: Uri, config: PoolConnectio
         htmlBody: getHtmlBody(config),
         storage,
         connectionConfig: config,
-    };
+    }
 
-    renderWebviewApp(extensionUri, app);
+    renderWebviewApp(extensionUri, app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
-    const { command, payload } = message;
+    const { command, payload } = message
 
 
     if (command === 'connection.execute.test') {
         try {
-            const connection = getConnectionClientModule(payload.moduleName).createPoolConnection(payload);
-            const { stats, rows } = await connection.testConnection();
-            const m = rows[0] ? rows[0].version : '';
-            await connection.closeConnection();
-            app.panel?.webview.postMessage({ command: `connection.execute.test.result`, payload: { stats, message: m } });
+            const connection = getConnectionClientModule(payload.moduleName).createPoolConnection(payload)
+            const { stats, rows } = await connection.testConnection()
+            const m = rows[0] ? rows[0].version : ''
+            await connection.closeConnection()
+            app.panel?.webview.postMessage({ command: `connection.execute.test.result`, payload: { stats, message: m } })
         } catch (e: any) {
             const stats = {
                 timeInMillisconds: 0,
-            };
-            const m = e.message;
-            logError('Failed to test connection.', app, e);
-            app.panel?.webview.postMessage({ command: `connection.execute.test.error`, payload: { stats, message: m } });
+            }
+            const m = e.message
+            logError('Failed to test connection.', app, e)
+            app.panel?.webview.postMessage({ command: `connection.execute.test.error`, payload: { stats, message: m } })
         }
     }
     else if (command === 'connection.execute.save') {
         try {
             if (!app.storage) {
-                logError('Webview App Storage is not defined.', app);
-                throw Error('Webview App Storage is not defined.');
+                logError('Webview App Storage is not defined.', app)
+                throw Error('Webview App Storage is not defined.')
             }
-            let authenticationClone = JSON.parse(JSON.stringify(payload.authentication));
+            const authenticationClone = JSON.parse(JSON.stringify(payload.authentication))
             if (!authenticationClone.saveAuthentication) {
                 payload.authentication = {
                     activeMethod: payload.authentication.activeMethod,
@@ -59,27 +59,27 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
                     saveAuthentication: false,
                     password: '',
                     username: ''
-                };
-                const id = storePoolConnectionConfig(payload, app.storage);
+                }
+                const id = storePoolConnectionConfig(payload, app.storage)
                 refreshPoolConnection({
                     id,
                     ...payload,
                     authentication: authenticationClone,
-                });
+                })
             } else {
-                const id = storePoolConnectionConfig(payload, app.storage);
+                const id = storePoolConnectionConfig(payload, app.storage)
                 refreshPoolConnection({
                     id,
                     ...payload,
-                });
+                })
             }
-            const m = payload.name;
-            commands.executeCommand('SmileDB.refreshConnectionsSilent');
-            app.panel?.webview.postMessage({ command: `connection.execute.save.result`, payload: { message: m } });
+            const m = payload.name
+            commands.executeCommand('SmileDB.refreshConnectionsSilent')
+            app.panel?.webview.postMessage({ command: `connection.execute.save.result`, payload: { message: m } })
         } catch (e: any) {
-            logError('Failed to save connection for webview app', app, e);
-            const m = e.message;
-            app.panel?.webview.postMessage({ command: `connection.execute.save.error`, payload: { message: m } });
+            logError('Failed to save connection for webview app', app, e)
+            const m = e.message
+            app.panel?.webview.postMessage({ command: `connection.execute.save.error`, payload: { message: m } })
         }
 
     }
@@ -90,14 +90,14 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
             canSelectMany: false,
             canSelectFolders: false,
             canSelectFiles: true,
-        });
+        })
 
-        const file = files ? files[0] : null;
-        app.panel?.webview.postMessage({ command: `file.open.result`, payload: file });
+        const file = files ? files[0] : null
+        app.panel?.webview.postMessage({ command: `file.open.result`, payload: file })
     }
 
     else if (command === "load.connectionConfig") {
-        app.panel?.webview.postMessage({ command: `load.connectionConfig`, payload: app.connectionConfig });
+        app.panel?.webview.postMessage({ command: `load.connectionConfig`, payload: app.connectionConfig })
     }
 }
 
@@ -205,5 +205,5 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
         <pre id="success-message"></pre>
     </div>
     <vscode-progress-ring id="loading" class="d-none"></vscode-progress-ring>
-    `;
+    `
 }

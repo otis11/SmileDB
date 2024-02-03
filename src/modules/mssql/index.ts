@@ -1,16 +1,14 @@
-import { ExtensionContext } from "vscode";
-import { MSSQLPoolConnection } from "./MSSQLPoolConnection";
-import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core";
-import { config } from "../../config";
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren";
+import { config } from "../../config"
+import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
+import { MSSQLPoolConnection } from "./MSSQLPoolConnection"
+import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mssqlModule: ConnectionClientModule = {
     name: 'MSSQL',
     icon: 'mssql.svg',
     iconActive: 'mssql-active.svg',
-    install(context: ExtensionContext) { },
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
-        return new MSSQLPoolConnection(config);
+        return new MSSQLPoolConnection(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {
@@ -47,4 +45,4 @@ export const mssqlModule: ConnectionClientModule = {
             }
         },
     },
-};
+}

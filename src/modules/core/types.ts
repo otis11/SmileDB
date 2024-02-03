@@ -1,5 +1,5 @@
-import { ExtensionContext, TreeItem, Uri } from "vscode";
-import { PoolConnectionTreeItem } from "./provider";
+import { ExtensionContext, TreeItem, Uri } from "vscode"
+import { PoolConnectionTreeItem } from "./provider"
 
 export interface PoolConnection {
     config: PoolConnectionConfig
@@ -19,7 +19,7 @@ export interface PoolConnection {
 
 export interface QueryResultRow {
     [key: string]: string | null | number
-}[];
+}[]
 
 export interface QueryResult {
     rows: QueryResultRow[],
@@ -45,21 +45,11 @@ export interface QueryConfigFetch extends QueryConfigBase {
     filterString?: string
 }
 
-export interface QueryConfigInsert extends QueryConfigBase {
+export type QueryConfigInsert = QueryConfigBase
 
-}
+export type QueryConfigDelete = QueryConfigBase
 
-export interface QueryConfigDelete extends QueryConfigBase {
-
-}
-
-export interface QueryConfigUpdate extends QueryConfigBase {
-
-}
-
-export interface ConnectionTestResult {
-
-}
+export type QueryConfigUpdate = QueryConfigBase
 
 export interface DatabaseObjectUpdate {
     update: QueryResultRow
@@ -80,26 +70,26 @@ export interface OrderByConfig {
     direction: 'ascending' | 'descending'
 }
 
-export type Query = string;
+export type Query = string
 
 export type QueryResultFieldFlag =
     'primary' |
     'unique' |
     'autoincrement' |
-    'notnull';
+    'notnull'
 
 export type QueryResultField = {
     name: string,
     flags: QueryResultFieldFlag[],
     type: string,
-};
+}
 
-export type ModuleName = string;
+export type ModuleName = string
 
 export type Module = {
     name: ModuleName
-    install(context: ExtensionContext): void
-};
+    install?: (context: ExtensionContext) => void
+}
 
 export type ConnectionClientModule = Module & {
     defaultPoolConnectionConfig: DefaultPoolConnectionConfig
@@ -107,7 +97,7 @@ export type ConnectionClientModule = Module & {
     getDatabaseTreeChildren(exntesionUri: Uri, item: PoolConnectionTreeItem): Promise<TreeItem[]>
     icon: string,
     iconActive: string,
-};
+}
 
 export interface PoolConnectionConfig {
     id: number,
@@ -155,18 +145,18 @@ export interface PoolConnectionConfig {
 export type AllowedFilterMethod =
     'client' |
     'database' |
-    'query';
+    'query'
 
 export type AllowedOrderByMethod =
     'client' |
-    'database';
+    'database'
 
 export type PoolConnectionAuthenticationMethod =
-    'usernamePassword';
+    'usernamePassword'
 
 export type PoolConnectionConnectionMethod =
     'hostPortDatabase' |
-    'file';
+    'file'
 
 export interface DefaultPoolConnectionConfig extends PoolConnectionConfig {
     id: -1

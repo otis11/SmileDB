@@ -1,16 +1,14 @@
-import { ExtensionContext } from "vscode";
-import { MySQLPoolConnection } from "./MySQLPoolConnection";
-import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core";
-import { config } from "../../config";
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren";
+import { config } from "../../config"
+import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
+import { MySQLPoolConnection } from "./MySQLPoolConnection"
+import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mysqlModule: ConnectionClientModule = {
     name: 'MySQL',
     icon: 'mysql.svg',
     iconActive: 'mysql-active.svg',
-    install(context: ExtensionContext) { },
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
-        return new MySQLPoolConnection(config);
+        return new MySQLPoolConnection(config)
     },
     getDatabaseTreeChildren,
     defaultPoolConnectionConfig: {
@@ -47,4 +45,4 @@ export const mysqlModule: ConnectionClientModule = {
             }
         },
     },
-};
+}

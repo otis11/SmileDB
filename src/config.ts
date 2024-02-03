@@ -1,7 +1,7 @@
-import { workspace } from 'vscode';
-import { LogLevel } from './modules/core';
+import { workspace } from 'vscode'
+import { LogLevel } from './modules/core'
 
-const vsconfig = workspace.getConfiguration('SmileDB');
+const vsconfig = workspace.getConfiguration('SmileDB')
 
 export const config = {
     general: {
@@ -74,4 +74,4 @@ export const config = {
             },
         }
     }
-};
+}

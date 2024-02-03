@@ -1,39 +1,39 @@
-import { ExtensionContext } from "vscode";
-import { Module, ModuleName, ConnectionClientModule } from "../types";
+import { ExtensionContext } from "vscode"
+import { Module, ModuleName, ConnectionClientModule } from "../types"
 
-const modules: Module[] = [];
-const connectionClientModules: ConnectionClientModule[] = [];
+const modules: Module[] = []
+const connectionClientModules: ConnectionClientModule[] = []
 
 export function installModule(module: Module, context: ExtensionContext) {
-    modules.push(module);
-    module.install(context);
+    modules.push(module)
+    module.install(context)
 }
 
 export function installConnectionClientModule(module: ConnectionClientModule, context: ExtensionContext) {
-    connectionClientModules.push(module);
-    module.install(context);
+    connectionClientModules.push(module)
+    module.install(context)
 }
 
 export function getModule(name: ModuleName) {
-    const module = modules.filter(module => module.name === name)[0];
+    const module = modules.filter(module => module.name === name)[0]
     if (!module) {
-        throw Error('Module with name "' + name + '" not found.');
+        throw Error('Module with name "' + name + '" not found.')
     }
-    return module;
+    return module
 }
 
 export function getConnectionClientModule(name: ModuleName) {
-    const module = connectionClientModules.filter(module => module.name === name)[0];
+    const module = connectionClientModules.filter(module => module.name === name)[0]
     if (!module) {
-        throw Error('Database Module with name "' + name + '" not found.');
+        throw Error('Database Module with name "' + name + '" not found.')
     }
-    return module;
+    return module
 }
 
 export function getConnectionClientModules() {
-    return connectionClientModules;
+    return connectionClientModules
 }
 
 export function getModules() {
-    return modules;
+    return modules
 }

@@ -1,8 +1,8 @@
-import { vscode } from "./vscode";
+import { vscode } from "./vscode"
 
 export function copyToClipboard(content: string) {
     vscode.postMessage({
         command: 'copy.toClipboard',
         payload: content
-    });
+    })
 }

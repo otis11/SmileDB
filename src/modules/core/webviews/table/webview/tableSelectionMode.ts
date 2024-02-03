@@ -1,305 +1,305 @@
-import { copyToClipboard } from "../../webview-helper/copyToClipboard";
-import { logError } from "../../webview-helper/logger";
-import { selectTextInContentEditableDiv } from "../../webview-helper/selectTextInContentEditableDiv";
-import { exportDataSeparatorDefaults } from "./exportData";
-import { updateOnPushChangesState } from "./push";
-import { getQueryResult, getQueryResultDeletions, setQueryResultDeletions, updateDataChanges } from "./query";
-import { getTableElement } from "./table";
+import { copyToClipboard } from "../../webview-helper/copyToClipboard"
+import { logError } from "../../webview-helper/logger"
+import { selectTextInContentEditableDiv } from "../../webview-helper/selectTextInContentEditableDiv"
+import { exportDataSeparatorDefaults } from "./exportData"
+import { updateOnPushChangesState } from "./push"
+import { getQueryResult, getQueryResultDeletions, setQueryResultDeletions, updateDataChanges } from "./query"
+import { getTableElement } from "./table"
 
-let isSelectionModeMouseDown = false;
-let selectionModeTableOffsetTop = 0;
-let selectionModeTableOffsetLeft = 40;
-let isSelectionModeActive = true;
-let colHeight = 26;
-let colWidth = 180;
-const selectionModeElement = document.getElementById('selection-mode') as HTMLElement;
-const tableSelectionContextMenuDeleteRowsElement = document.getElementById('table-selection-context-menu-delete-rows') as HTMLElement;
-const tableSelectionContextMenuDeleteRowsClearElement = document.getElementById('table-selection-context-menu-delete-rows-clear') as HTMLElement;
-const tableSelectionContextMenuDeleteRowElement = document.getElementById('table-selection-context-menu-delete-row') as HTMLElement;
-const tableSelectionContextMenuDeleteRowClearElement = document.getElementById('table-selection-context-menu-delete-row-clear') as HTMLElement;
-const tableSelectionContextMenuSelectRowElement = document.getElementById('table-selection-context-menu-select-row') as HTMLElement;
-const tableSelectionContextMenuSelectColumnElement = document.getElementById('table-selection-context-menu-select-column') as HTMLElement;
-const tableSelectionContextMenuSelectAllElement = document.getElementById('table-selection-context-menu-select-all') as HTMLElement;
-const tableSelectionContextMenuSetNullElement = document.getElementById('table-selection-context-menu-set-null') as HTMLElement;
-const tableSelectionContextMenuElement = document.getElementById('table-selection-context-menu') as HTMLElement;
+let isSelectionModeMouseDown = false
+let selectionModeTableOffsetTop = 0
+const selectionModeTableOffsetLeft = 40
+let isSelectionModeActive = true
+const colHeight = 26
+const colWidth = 180
+const selectionModeElement = document.getElementById('selection-mode') as HTMLElement
+const tableSelectionContextMenuDeleteRowsElement = document.getElementById('table-selection-context-menu-delete-rows') as HTMLElement
+const tableSelectionContextMenuDeleteRowsClearElement = document.getElementById('table-selection-context-menu-delete-rows-clear') as HTMLElement
+const tableSelectionContextMenuDeleteRowElement = document.getElementById('table-selection-context-menu-delete-row') as HTMLElement
+const tableSelectionContextMenuDeleteRowClearElement = document.getElementById('table-selection-context-menu-delete-row-clear') as HTMLElement
+const tableSelectionContextMenuSelectRowElement = document.getElementById('table-selection-context-menu-select-row') as HTMLElement
+const tableSelectionContextMenuSelectColumnElement = document.getElementById('table-selection-context-menu-select-column') as HTMLElement
+const tableSelectionContextMenuSelectAllElement = document.getElementById('table-selection-context-menu-select-all') as HTMLElement
+const tableSelectionContextMenuSetNullElement = document.getElementById('table-selection-context-menu-set-null') as HTMLElement
+const tableSelectionContextMenuElement = document.getElementById('table-selection-context-menu') as HTMLElement
 let contextMenuTopLeftPosition = {
     row: 0,
     col: 0
-};
+}
 
 export function addSelectionModeOverlayEventListeners(overlayElement: HTMLElement | null) {
     if (overlayElement) {
-        overlayElement.addEventListener('mousedown', onSelectionModeMouseDown);
-        overlayElement.addEventListener('mouseup', onSelectionModeMouseUp);
-        overlayElement.addEventListener('mousemove', onSelectionModeMouseMove);
-        overlayElement.addEventListener('contextmenu', onSelectionModeContextMenu);
-        overlayElement.addEventListener('dblclick', onSelectionModeDoubleClick);
-        selectionModeTableOffsetTop = getTableElement()?.offsetTop || 0;
+        overlayElement.addEventListener('mousedown', onSelectionModeMouseDown)
+        overlayElement.addEventListener('mouseup', onSelectionModeMouseUp)
+        overlayElement.addEventListener('mousemove', onSelectionModeMouseMove)
+        overlayElement.addEventListener('contextmenu', onSelectionModeContextMenu)
+        overlayElement.addEventListener('dblclick', onSelectionModeDoubleClick)
+        selectionModeTableOffsetTop = getTableElement()?.offsetTop || 0
     }
 }
 
 export function getIsSelectionModeActive() {
-    return isSelectionModeActive;
+    return isSelectionModeActive
 }
 
 export function renderSelectionMode() {
     selectionModeElement?.addEventListener('click', () => {
-        toggleSelectionMode();
-    });
-    renderSelectionModeContextMenu();
+        toggleSelectionMode()
+    })
+    renderSelectionModeContextMenu()
 }
 
 export function toggleSelectionMode() {
-    isSelectionModeActive = !isSelectionModeActive;
-    updateSelectionMode();
+    isSelectionModeActive = !isSelectionModeActive
+    updateSelectionMode()
 }
 
 export function setEditMode(mode: 'Edit' | 'Select') {
     if (mode === 'Edit') {
-        isSelectionModeActive = false;
+        isSelectionModeActive = false
     } else {
-        isSelectionModeActive = true;
+        isSelectionModeActive = true
     }
-    updateSelectionMode();
+    updateSelectionMode()
 }
 
 export function updateSelectionMode() {
     if (!selectionModeElement) {
-        return;
-    };
+        return
+    }
 
-    const selectionModeOverlayElement = document.getElementById('table-selection-mode-overlay') as HTMLElement;
+    const selectionModeOverlayElement = document.getElementById('table-selection-mode-overlay') as HTMLElement
     if (isSelectionModeActive) {
-        selectionModeElement.innerHTML = '<i class="codicon codicon-edit"></i>';
-        selectionModeOverlayElement?.classList.remove('d-none');
+        selectionModeElement.innerHTML = '<i class="codicon codicon-edit"></i>'
+        selectionModeOverlayElement?.classList.remove('d-none')
     } else {
-        selectionModeElement.innerHTML = '<i class="codicon codicon-inspect"></i>';
-        selectionModeOverlayElement?.classList.add('d-none');
-        selectionModeClearSelectedCols();
+        selectionModeElement.innerHTML = '<i class="codicon codicon-inspect"></i>'
+        selectionModeOverlayElement?.classList.add('d-none')
+        selectionModeClearSelectedCols()
     }
 }
 
-function onSelectionModeDoubleClick(e: any) {
-    const { row, col } = getTargetRowColSelectionMode(e);
+function onSelectionModeDoubleClick(e: MouseEvent) {
+    const { row, col } = getTargetRowColSelectionMode(e)
 
-    const tableElement = getTableElement();
-    const rowElement = tableElement?.children[row];
+    const tableElement = getTableElement()
+    const rowElement = tableElement?.children[row]
 
-    const colElement = rowElement?.children[col + 1] as HTMLDivElement;
+    const colElement = rowElement?.children[col + 1] as HTMLDivElement
 
-    colElement?.focus();
-    selectTextInContentEditableDiv(colElement);
-    selectionModeClearSelectedCols();
+    colElement?.focus()
+    selectTextInContentEditableDiv(colElement)
+    selectionModeClearSelectedCols()
 }
 
-function onSelectionModeContextMenu(e: any) {
-    e.preventDefault();
-    contextMenuTopLeftPosition = getTargetRowColSelectionMode(e);
+function onSelectionModeContextMenu(e: MouseEvent) {
+    e.preventDefault()
+    contextMenuTopLeftPosition = getTargetRowColSelectionMode(e)
 
     if (tableSelectionContextMenuElement) {
-        tableSelectionContextMenuElement.style.display = 'block';
-        tableSelectionContextMenuElement.style.left = e.clientX + 'px';
-        tableSelectionContextMenuElement.style.top = e.clientY + 'px';
+        tableSelectionContextMenuElement.style.display = 'block'
+        tableSelectionContextMenuElement.style.left = e.clientX + 'px'
+        tableSelectionContextMenuElement.style.top = e.clientY + 'px'
     }
 
-    const queryResult = getQueryResult();
+    const queryResult = getQueryResult()
     if (queryResult?.fields[contextMenuTopLeftPosition.col].flags.includes('notnull')) {
-        tableSelectionContextMenuSetNullElement.classList.add('disabled');
+        tableSelectionContextMenuSetNullElement.classList.add('disabled')
     } else {
-        tableSelectionContextMenuSetNullElement.classList.remove('disabled');
+        tableSelectionContextMenuSetNullElement.classList.remove('disabled')
     }
 }
 
-function onSelectionModeMouseDown(e: any) {
+function onSelectionModeMouseDown(e: MouseEvent) {
     // right click for context menu
     if (e.button === 2) {
-        return;
+        return
     }
-    isSelectionModeMouseDown = true;
-    selectionModeClearSelectedCols();
+    isSelectionModeMouseDown = true
+    selectionModeClearSelectedCols()
 }
 
 function selectionModeClearSelectedCols() {
-    const tableElement = getTableElement();
-    const selectedCols = tableElement?.querySelectorAll('.col--selected');
+    const tableElement = getTableElement()
+    const selectedCols = tableElement?.querySelectorAll('.col--selected')
     if (selectedCols) {
         for (let i = 0; i < selectedCols.length; i++) {
-            selectedCols[i].classList.remove('col--selected');
+            selectedCols[i].classList.remove('col--selected')
         }
     }
 }
 
-function onSelectionModeMouseUp(e: any) {
+function onSelectionModeMouseUp(e: MouseEvent) {
     // right click for context menu
     if (e.button === 2) {
-        return;
+        return
     }
-    isSelectionModeMouseDown = false;
+    isSelectionModeMouseDown = false
 
-    const { row, col } = getTargetRowColSelectionMode(e);
+    const { row, col } = getTargetRowColSelectionMode(e)
 
-    const tableElement = getTableElement();
-    const rowElement = tableElement?.children[row];
-    rowElement?.children[col + 1].classList.add('col--selected');
-    rowElement?.firstElementChild?.classList.add('col--selected');
+    const tableElement = getTableElement()
+    const rowElement = tableElement?.children[row]
+    rowElement?.children[col + 1].classList.add('col--selected')
+    rowElement?.firstElementChild?.classList.add('col--selected')
 }
 
-function onSelectionModeMouseMove(e: any) {
+function onSelectionModeMouseMove(e: MouseEvent) {
     if (!isSelectionModeMouseDown) {
-        return;
+        return
     }
 
-    const { row, col } = getTargetRowColSelectionMode(e);
+    const { row, col } = getTargetRowColSelectionMode(e)
 
-    const tableElement = getTableElement();
-    const rowElement = tableElement?.children[row];
-    rowElement?.children[col + 1].classList.add('col--selected');
-    rowElement?.firstElementChild?.classList.add('col--selected');
+    const tableElement = getTableElement()
+    const rowElement = tableElement?.children[row]
+    rowElement?.children[col + 1].classList.add('col--selected')
+    rowElement?.firstElementChild?.classList.add('col--selected')
 }
 
-function getTargetRowColSelectionMode(e: any) {
+function getTargetRowColSelectionMode(e: MouseEvent) {
     return {
         row: Math.floor((e.pageY - selectionModeTableOffsetTop) / colHeight),
         col: Math.floor((e.pageX - selectionModeTableOffsetLeft) / colWidth),
-    };
+    }
 }
 
 export function addSelectedRowsToDeletion() {
-    const tableElement = getTableElement();
-    const rowSelectedNumberElements = tableElement?.querySelectorAll('.row:not(.row--add) .row-number.col--selected');
-    const rows: number[] = [];
+    const tableElement = getTableElement()
+    const rowSelectedNumberElements = tableElement?.querySelectorAll('.row:not(.row--add) .row-number.col--selected')
+    const rows: number[] = []
     if (rowSelectedNumberElements) {
         for (let i = 0; i < rowSelectedNumberElements?.length; i++) {
-            const rowElement = rowSelectedNumberElements[i].parentElement;
-            rowElement?.classList.add('row--delete');
-            const rowNumberString = rowElement?.getAttribute('data-row');
+            const rowElement = rowSelectedNumberElements[i].parentElement
+            rowElement?.classList.add('row--delete')
+            const rowNumberString = rowElement?.getAttribute('data-row')
             if (rowNumberString) {
-                rows.push(parseInt(rowNumberString));
+                rows.push(parseInt(rowNumberString))
             }
         }
     }
 
-    setQueryResultDeletions([...getQueryResultDeletions(), ...rows]);
-    updateOnPushChangesState();
+    setQueryResultDeletions([...getQueryResultDeletions(), ...rows])
+    updateOnPushChangesState()
 }
 
 export function copySelectedColumns() {
     // if there is something selected, prefer the selection
-    const selection = window.getSelection()?.toString();
+    const selection = window.getSelection()?.toString()
     if (selection) {
-        copyToClipboard(selection);
-        return;
+        copyToClipboard(selection)
+        return
     }
 
-    const tableElement = getTableElement();
-    const selectedColumns = tableElement?.querySelectorAll('div.col--selected');
+    const tableElement = getTableElement()
+    const selectedColumns = tableElement?.querySelectorAll('div.col--selected')
     if (selectedColumns === undefined || selectedColumns.length === 0) {
-        return; // noting to copy
+        return // noting to copy
     }
 
-    let content = '';
+    let content = ''
     for (let i = 0; i < selectedColumns.length; i++) {
-        const col = selectedColumns[i];
+        const col = selectedColumns[i]
         if (col.classList.contains('row-number')) {
             // remove extra separator at end of last column and add newline
             if (i !== 0) {
-                content = content.slice(0, -1) + '\n';
+                content = content.slice(0, -1) + '\n'
             }
-            continue;
+            continue
         }
-        let value = col.innerHTML;
+        let value = col.innerHTML
         if (value.includes(',')) {
-            value = `"${value}"`;
+            value = `"${value}"`
         }
-        content += value + exportDataSeparatorDefaults['CSV'];
+        content += value + exportDataSeparatorDefaults['CSV']
     }
     // remove last separator, maybe improve that separator only gets added at the correct locations
-    copyToClipboard(content.slice(0, -1));
+    copyToClipboard(content.slice(0, -1))
 }
 
 export function renderSelectionModeContextMenu() {
-    const tableElement = getTableElement();
-    tableSelectionContextMenuDeleteRowsElement?.addEventListener('click', addSelectedRowsToDeletion);
+    const tableElement = getTableElement()
+    tableSelectionContextMenuDeleteRowsElement?.addEventListener('click', addSelectedRowsToDeletion)
 
-    tableSelectionContextMenuDeleteRowsClearElement?.addEventListener('click', (e) => {
-        const rowSelectedNumberElements = tableElement?.querySelectorAll('.row-number.col--selected');
-        const rows: number[] = [];
+    tableSelectionContextMenuDeleteRowsClearElement?.addEventListener('click', () => {
+        const rowSelectedNumberElements = tableElement?.querySelectorAll('.row-number.col--selected')
+        const rows: number[] = []
         if (rowSelectedNumberElements) {
             for (let i = 0; i < rowSelectedNumberElements?.length; i++) {
-                const rowElement = rowSelectedNumberElements[i].parentElement;
-                rowElement?.classList.remove('row--delete');
-                const rowNumberString = rowElement?.getAttribute('data-row');
+                const rowElement = rowSelectedNumberElements[i].parentElement
+                rowElement?.classList.remove('row--delete')
+                const rowNumberString = rowElement?.getAttribute('data-row')
                 if (rowNumberString) {
-                    rows.push(parseInt(rowNumberString));
+                    rows.push(parseInt(rowNumberString))
                 }
             }
         }
 
-        setQueryResultDeletions(getQueryResultDeletions().filter(rowNumber => !rows.includes(rowNumber)));
-        updateOnPushChangesState();
-    });
+        setQueryResultDeletions(getQueryResultDeletions().filter(rowNumber => !rows.includes(rowNumber)))
+        updateOnPushChangesState()
+    })
 
-    tableSelectionContextMenuSelectRowElement.addEventListener('click', (e) => {
-        const row = tableElement?.children[contextMenuTopLeftPosition.row];
+    tableSelectionContextMenuSelectRowElement.addEventListener('click', () => {
+        const row = tableElement?.children[contextMenuTopLeftPosition.row]
         if (!row) {
-            logError('Error selecting row (row not found)', row);
-            return;
+            logError('Error selecting row (row not found)', row)
+            return
         }
         for (let i = 0; i < row?.children.length || 0; i++) {
-            row.children[i].classList.add('col--selected');
+            row.children[i].classList.add('col--selected')
         }
-    });
+    })
 
-    tableSelectionContextMenuSelectColumnElement.addEventListener('click', (e) => {
+    tableSelectionContextMenuSelectColumnElement.addEventListener('click', () => {
         if (!tableElement) {
-            logError('Error selecting all (tableElement not found)', tableElement);
-            return;
+            logError('Error selecting all (tableElement not found)', tableElement)
+            return
         }
         for (let i = 0; i < tableElement.children.length || 0; i++) {
-            const col = tableElement.children[i].children[contextMenuTopLeftPosition.col + 1];
-            col.classList.add('col--selected');
+            const col = tableElement.children[i].children[contextMenuTopLeftPosition.col + 1]
+            col.classList.add('col--selected')
         }
-    });
+    })
 
-    tableSelectionContextMenuSelectAllElement.addEventListener('click', (e) => {
+    tableSelectionContextMenuSelectAllElement.addEventListener('click', () => {
         if (!tableElement) {
-            logError('Error selecting all (tableElement not found)', tableElement);
-            return;
+            logError('Error selecting all (tableElement not found)', tableElement)
+            return
         }
         for (let i = 0; i < tableElement.children.length || 0; i++) {
-            const row = tableElement.children[i];
+            const row = tableElement.children[i]
             for (let i = 0; i < row.children.length || 0; i++) {
-                row.children[i].classList.add('col--selected');
+                row.children[i].classList.add('col--selected')
             }
         }
 
-    });
+    })
 
-    tableSelectionContextMenuDeleteRowElement.addEventListener('click', (e) => {
-        tableElement?.children[contextMenuTopLeftPosition.row].classList.add('row--delete');
-        setQueryResultDeletions([...getQueryResultDeletions(), contextMenuTopLeftPosition.row]);
-        updateOnPushChangesState();
-    });
+    tableSelectionContextMenuDeleteRowElement.addEventListener('click', () => {
+        tableElement?.children[contextMenuTopLeftPosition.row].classList.add('row--delete')
+        setQueryResultDeletions([...getQueryResultDeletions(), contextMenuTopLeftPosition.row])
+        updateOnPushChangesState()
+    })
 
-    tableSelectionContextMenuDeleteRowClearElement.addEventListener('click', (e) => {
-        tableElement?.children[contextMenuTopLeftPosition.row].classList.remove('row--delete');
-        setQueryResultDeletions(getQueryResultDeletions().filter(rowNumber => rowNumber !== contextMenuTopLeftPosition.row));
-        updateOnPushChangesState();
-    });
+    tableSelectionContextMenuDeleteRowClearElement.addEventListener('click', () => {
+        tableElement?.children[contextMenuTopLeftPosition.row].classList.remove('row--delete')
+        setQueryResultDeletions(getQueryResultDeletions().filter(rowNumber => rowNumber !== contextMenuTopLeftPosition.row))
+        updateOnPushChangesState()
+    })
 
-    tableSelectionContextMenuSetNullElement.addEventListener('click', (e) => {
-        const target = tableElement?.children[contextMenuTopLeftPosition.row].children[contextMenuTopLeftPosition.col + 1];
+    tableSelectionContextMenuSetNullElement.addEventListener('click', () => {
+        const target = tableElement?.children[contextMenuTopLeftPosition.row].children[contextMenuTopLeftPosition.col + 1]
         if (target) {
-            target.setAttribute('data-placeholder', '<NULL>');
-            target.innerHTML = '';
+            target.setAttribute('data-placeholder', '<NULL>')
+            target.innerHTML = ''
         }
-        updateDataChanges(contextMenuTopLeftPosition.row, contextMenuTopLeftPosition.col, null);
-        updateOnPushChangesState();
-    });
+        updateDataChanges(contextMenuTopLeftPosition.row, contextMenuTopLeftPosition.col, null)
+        updateOnPushChangesState()
+    })
 
-    window.addEventListener('click', (e) => {
+    window.addEventListener('click', () => {
         if (tableSelectionContextMenuElement) {
-            tableSelectionContextMenuElement.style.display = 'none';
+            tableSelectionContextMenuElement.style.display = 'none'
         }
-    });
+    })
 }

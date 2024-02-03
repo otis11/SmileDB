@@ -1,14 +1,13 @@
-import { Uri, commands, window } from "vscode";
-import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
-import { PoolConnectionConfig } from "../../types";
-import { ExtensionStorage, getActiveConnectionConfigs, getConnectionClientModule, getIconDarkLightPaths, logError, refreshPoolConnection, storePoolConnectionConfig } from "../../common";
+import { Uri } from "vscode"
+import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
+import { ExtensionStorage, getActiveConnectionConfigs, getIconDarkLightPaths } from "../../common"
 
 export function renderActiveConnectionsApp(extensionUri: Uri, storage: ExtensionStorage) {
-    const id = `stats`;
-    let app = getApp(id);
+    const id = `stats`
+    let app = getApp(id)
     if (app) {
         // close old edit connection panel
-        app.panel?.dispose();
+        app.panel?.dispose()
     }
 
     app = {
@@ -19,13 +18,13 @@ export function renderActiveConnectionsApp(extensionUri: Uri, storage: Extension
         iconPath: getIconDarkLightPaths(extensionUri, 'layers-active.svg'),
         htmlBody: getHtmlBody(),
         storage,
-    };
+    }
 
-    renderWebviewApp(extensionUri, app);
+    renderWebviewApp(extensionUri, app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
-    const { command, payload } = message;
+    const { command, payload } = message
 
 
     if (command === "load.activeConnections") {
@@ -34,7 +33,7 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
             payload: {
                 activeConnections: getActiveConnectionConfigs()
             }
-        });
+        })
     }
 }
 
@@ -50,5 +49,5 @@ function getHtmlBody(): string {
     <div id="active-connections-container">
 
     </div>
-    `;
+    `
 }

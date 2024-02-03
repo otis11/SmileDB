@@ -1,9 +1,9 @@
-const loadingElement = document.getElementById("loading");
+const loadingElement = document.getElementById("loading")
 
-export function setLoading(loading: Boolean) {
+export function setLoading(loading: boolean) {
     if (loading) {
-        loadingElement?.classList.remove('d-none');
+        loadingElement?.classList.remove('d-none')
     } else {
-        loadingElement?.classList.add('d-none');
+        loadingElement?.classList.add('d-none')
     }
 }

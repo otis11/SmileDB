@@ -1,5 +1,5 @@
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultRow, Timer, jsonStringify } from "../core";
-import Redis from 'ioredis';
+import Redis from 'ioredis'
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigFetch, QueryResultField, QueryResultRow, Timer, jsonStringify } from "../core"
 
 const REDIS_START_COMMAND_KEYWORDS = [
     'set', 'get', 'del', 'hset', 'hget', 'scan', 'select',
@@ -14,7 +14,7 @@ const REDIS_START_COMMAND_KEYWORDS = [
     'eval', 'evalsha', 'script',
     'auth', 'echo', 'ping', 'quit', 'select',
     'bgrewriteaof', 'bgsave', 'client', 'command', 'config', 'dbsize', 'debug', 'flushall', 'flushdb', 'info', 'lastsave', 'monitor', 'role', 'save', 'shutdown', 'slaveof', 'slowlog', 'sync', 'time'
-];
+]
 
 const REDIS_TYPES = {
     hash: 'hash',
@@ -22,20 +22,20 @@ const REDIS_TYPES = {
     list: 'list',
     set: 'set',
     zset: 'zset'
-};
+}
 
 export class RedisPoolConnection implements PoolConnection {
-    private keyTypeCache: Record<string, string> = {};
-    private pool: Redis | null = null;
-    private isRedisConnected = false;
-    private readonly redisKeyForKey: string = 'Redis Key';
-    private readonly redisKeyForValue = 'Redis Value';
-    private readonly redisPlaceholderForDoubleQuote = 'PLACEHOLDER_FOR_DOUBLE_QUOTE';
+    private keyTypeCache: Record<string, string> = {}
+    private pool: Redis | null = null
+    private isRedisConnected = false
+    private readonly redisKeyForKey: string = 'Redis Key'
+    private readonly redisKeyForValue = 'Redis Value'
+    private readonly redisPlaceholderForDoubleQuote = 'PLACEHOLDER_FOR_DOUBLE_QUOTE'
 
     constructor(public config: PoolConnectionConfig) { }
 
     async closeConnection() {
-        await this.pool?.quit();
+        await this.pool?.quit()
     }
 
     async fetchTables() {
@@ -46,19 +46,19 @@ export class RedisPoolConnection implements PoolConnection {
             stats: {
                 timeInMilliseconds: 0,
             }
-        };
+        }
     }
 
     async fetchDatabases() {
-        const timer = new Timer();
-        await this.connectToRedis();
-        const queryResult = await this.pool?.call('CONFIG', 'GET', 'databases') as string[];
-        const totalDatabases = parseInt(queryResult[1]);
-        const rows: QueryResultRow[] = [];
+        const timer = new Timer()
+        await this.connectToRedis()
+        const queryResult = await this.pool?.call('CONFIG', 'GET', 'databases') as string[]
+        const totalDatabases = parseInt(queryResult[1])
+        const rows: QueryResultRow[] = []
         for (let i = 0; i < totalDatabases; i++) {
             rows.push({
                 database: i
-            });
+            })
         }
         // TODO
         return {
@@ -71,15 +71,15 @@ export class RedisPoolConnection implements PoolConnection {
             stats: {
                 timeInMilliseconds: timer.stop(),
             }
-        };
+        }
     }
 
     private async connectToRedis() {
         if (this.isRedisConnected) {
-            return;
+            return
         }
 
-        const db = parseInt(this.config.connection.database || '0');
+        const db = parseInt(this.config.connection.database || '0')
         this.pool = new Redis({
             db,
             port: this.config.connection.port,
@@ -87,28 +87,28 @@ export class RedisPoolConnection implements PoolConnection {
             username: this.config.authentication.username,
             password: this.config.authentication.password,
             retryStrategy: () => null
-        });
+        })
 
         await new Promise((resolve, reject) => {
             this.pool?.on('error', (e) => {
-                reject(e);
-            });
+                reject(e)
+            })
 
             this.pool?.on('connect', () => {
-                this.isRedisConnected = true;
-                resolve(null);
-            });
-        });
+                this.isRedisConnected = true
+                resolve(null)
+            })
+        })
     }
 
     async testConnection() {
-        const timer = new Timer();
-        await this.connectToRedis();
-        const info = await this.pool?.info();
-        const versionRegex = new RegExp(/redis_version(.*)/);
-        const osRegex = new RegExp(/os(.*)/);
-        const versionMatch = info?.match(versionRegex);
-        const osMatch = info?.match(osRegex);
+        const timer = new Timer()
+        await this.connectToRedis()
+        const info = await this.pool?.info()
+        const versionRegex = new RegExp(/redis_version(.*)/)
+        const osRegex = new RegExp(/os(.*)/)
+        const versionMatch = info?.match(versionRegex)
+        const osMatch = info?.match(osRegex)
         return {
             rows: [{
                 version: (versionMatch ? versionMatch[0] : '') + '  ' + (osMatch ? osMatch[0] : ''),
@@ -117,71 +117,71 @@ export class RedisPoolConnection implements PoolConnection {
             stats: {
                 timeInMilliseconds: timer.stop(),
             }
-        };
+        }
     }
 
-    buildQueriesDelete(deletions: DatabaseObjectDelete[], queryConfig: QueryConfigDelete) {
-        const singleDeleteQuery = 'DEL ' + deletions.map(deletion => deletion.where[this.redisKeyForKey]).join(' ');
-        return [singleDeleteQuery];
+    buildQueriesDelete(deletions: DatabaseObjectDelete[]) {
+        const singleDeleteQuery = 'DEL ' + deletions.map(deletion => deletion.where[this.redisKeyForKey]).join(' ')
+        return [singleDeleteQuery]
     }
 
     buildQueriesFetch(queryConfig: QueryConfigFetch) {
-        return [`SELECT ${queryConfig.database} SCAN ${queryConfig.page} COUNT ${queryConfig.pageResultsLimit}`];
+        return [`SELECT ${queryConfig.database} SCAN ${queryConfig.page} COUNT ${queryConfig.pageResultsLimit}`]
     }
 
-    buildQueriesInsert(insertions: DatabaseObjectInsert, queryConfig: QueryConfigInsert) {
-        const queries = [];
+    buildQueriesInsert(insertions: DatabaseObjectInsert) {
+        const queries = []
         for (let i = 0; i < insertions.insertions.length; i++) {
-            queries.push(`SET "${insertions.insertions[i][this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}" "${insertions.insertions[i][this.redisKeyForValue]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
+            queries.push(`SET "${insertions.insertions[i][this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}" "${insertions.insertions[i][this.redisKeyForValue]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`)
         }
-        return queries;
+        return queries
     }
 
-    buildQueriesUpdate(changes: DatabaseObjectUpdate[], queryConfig: QueryConfigUpdate) {
-        const queries = [];
+    buildQueriesUpdate(changes: DatabaseObjectUpdate[]) {
+        const queries = []
         for (let i = 0; i < changes.length; i++) {
-            const key = `${changes[i].where[this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}`;
-            const value = changes[i].update[this.redisKeyForValue] as string;
+            const key = `${changes[i].where[this.redisKeyForKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}`
+            const value = changes[i].update[this.redisKeyForValue] as string
             if (this.keyTypeCache[key] === REDIS_TYPES.string) {
-                queries.push(`SET ${key} "${value?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
+                queries.push(`SET ${key} "${value?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`)
             }
             else if (this.keyTypeCache[key] === REDIS_TYPES.hash) {
                 // incoming as json object {'key1': 'value1'}
-                const object = JSON.parse(value);
+                const object = JSON.parse(value)
                 for (const hashKey of Object.keys(object)) {
-                    queries.push(`HSET ${key} "${hashKey}" "${object[hashKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`);
+                    queries.push(`HSET ${key} "${hashKey}" "${object[hashKey]?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote)}"`)
                 }
             }
             else {
                 // incoming as json array ["x", "y"]
-                let addCommandKeyword = '';
+                let addCommandKeyword = ''
                 if (this.keyTypeCache[key] === REDIS_TYPES.list) {
-                    addCommandKeyword = 'RPUSH';
+                    addCommandKeyword = 'RPUSH'
                 }
                 if (this.keyTypeCache[key] === REDIS_TYPES.set) {
-                    addCommandKeyword = 'SADD';
+                    addCommandKeyword = 'SADD'
                 }
                 if (this.keyTypeCache[key] === REDIS_TYPES.zset) {
-                    addCommandKeyword = 'ZADD';
+                    addCommandKeyword = 'ZADD'
                 }
-                const array = JSON.parse(value);
+                const array = JSON.parse(value)
                 // delete old set/array
-                queries.push(`DEL ${key}`);
+                queries.push(`DEL ${key}`)
 
                 // push all, zadd needs counting
                 if (this.keyTypeCache[key] === REDIS_TYPES.zset) {
-                    queries.push(`${addCommandKeyword} ${key} ${array.map((v: { toString: () => string; }, index: number) => (index + 1) + ' "' + v?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote) + '"').join(' ')}`);
+                    queries.push(`${addCommandKeyword} ${key} ${array.map((v: { toString: () => string; }, index: number) => (index + 1) + ' "' + v?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote) + '"').join(' ')}`)
                 } else {
-                    queries.push(`${addCommandKeyword} ${key} ${array.map((v: { toString: () => string; }) => '"' + v?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote) + '"').join(' ')}`);
+                    queries.push(`${addCommandKeyword} ${key} ${array.map((v: { toString: () => string; }) => '"' + v?.toString().replace(/"/g, this.redisPlaceholderForDoubleQuote) + '"').join(' ')}`)
                 }
             }
         }
-        return queries;
+        return queries
     }
 
     async executeQuery(query: string) {
-        const timer = new Timer();
-        const result = await this.executeQueryString(query);
+        const timer = new Timer()
+        const result = await this.executeQueryString(query)
         return {
             fields: this.getQueryResultRedisFields(),
             rows: result.rows,
@@ -189,32 +189,32 @@ export class RedisPoolConnection implements PoolConnection {
                 rowCount: result.rowCount,
                 timeInMilliseconds: timer.stop()
             }
-        };
+        }
     }
 
     private async executeQueryString(query: string) {
-        await this.connectToRedis();
-        const rows: QueryResultRow[] = [];
-        const regex = /("[^"]+"|'[^']+'|\S+)/g;
-        const args = query.match(regex);
+        await this.connectToRedis()
+        const rows: QueryResultRow[] = []
+        const regex = /("[^"]+"|'[^']+'|\S+)/g
+        const args = query.match(regex)
         if (args === null) {
             return {
                 rows: [],
                 rowCount: 0,
-            };
+            }
         }
-        const commands: string[][] = [];
+        const commands: string[][] = []
         for (const arg of args) {
             if (REDIS_START_COMMAND_KEYWORDS.includes(arg.toLowerCase())) {
-                commands.push([]);
+                commands.push([])
             }
-            commands.at(-1)?.push(arg.replace(/"/g, '').replace(new RegExp(this.redisPlaceholderForDoubleQuote, 'g'), '"'));
+            commands.at(-1)?.push(arg.replace(/"/g, '').replace(new RegExp(this.redisPlaceholderForDoubleQuote, 'g'), '"'))
         }
         // doesnt seem to work correctly with multi
         //const result = await this.pool?.multi(commands).exec();
-        let result: string[] = [];
+        let result: string[] = []
         for (const command of commands) {
-            result = await this.pool?.call(command[0], ...command.slice(1)) as string[];
+            result = await this.pool?.call(command[0], ...command.slice(1)) as string[]
         }
 
         // custom queries, eg "get x" just returns "y" should be improved further at some point
@@ -225,42 +225,42 @@ export class RedisPoolConnection implements PoolConnection {
                     [this.redisKeyForKey]: 'result'
                 }],
                 rowCount: await this.pool?.dbsize() || 0,
-            };
+            }
         }
 
         for (let i = 0; i < result[1].length; i++) {
             // TODO inefficient, there needs to be something better
-            const key = result[1][i];
-            const type = this.keyTypeCache[key] ? this.keyTypeCache[key] : await this.pool?.type(key);
+            const key = result[1][i]
+            const type = this.keyTypeCache[key] ? this.keyTypeCache[key] : await this.pool?.type(key)
             if (type) {
-                this.keyTypeCache[key] = type;
+                this.keyTypeCache[key] = type
             }
             rows.push({
                 [this.redisKeyForValue]: jsonStringify(await this.getRedisValue(key, type)),
                 [this.redisKeyForKey]: result[1][i]
-            });
+            })
         }
         return {
             rows,
             rowCount: await this.pool?.dbsize() || 0,
-        };
+        }
     }
 
     private async getRedisValue(key: string, type: string | undefined) {
         if (type === REDIS_TYPES.string) {
-            return this.pool?.get(key);
+            return this.pool?.get(key)
         }
         if (type === REDIS_TYPES.hash) {
-            return this.pool?.hgetall(key);
+            return this.pool?.hgetall(key)
         }
         if (type === REDIS_TYPES.list) {
-            return this.pool?.lrange(key, 0, -1);
+            return this.pool?.lrange(key, 0, -1)
         }
         if (type === REDIS_TYPES.set) {
-            return this.pool?.smembers(key);
+            return this.pool?.smembers(key)
         }
         if (type === REDIS_TYPES.zset) {
-            return this.pool?.zrange(key, 0, -1);
+            return this.pool?.zrange(key, 0, -1)
         }
     }
 
@@ -276,16 +276,16 @@ export class RedisPoolConnection implements PoolConnection {
                 type: 'unkown',
                 flags: [],
             }
-        ];
+        ]
     }
 
     async executeQueriesAndFetch(queries: string[], queryConfig: QueryConfigFetch) {
-        const timer = new Timer();
+        const timer = new Timer()
         for (let i = 0; i < queries.length; i++) {
-            await this.executeQueryString(queries[i]);
+            await this.executeQueryString(queries[i])
         }
-        const fetchQueries = this.buildQueriesFetch(queryConfig);
-        const result = await this.executeQueryString(fetchQueries[0]);
+        const fetchQueries = this.buildQueriesFetch(queryConfig)
+        const result = await this.executeQueryString(fetchQueries[0])
         return {
             fields: this.getQueryResultRedisFields(),
             rows: result.rows,
@@ -293,6 +293,6 @@ export class RedisPoolConnection implements PoolConnection {
                 rowCount: result.rowCount,
                 timeInMilliseconds: timer.stop()
             }
-        };
+        }
     }
 }

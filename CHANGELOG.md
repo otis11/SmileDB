@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.1.6] Unreleased
+- Theme: improve the background colors adopted from VSCode Color Theme (before some were transparent which caused visual issues)
+- Code Improvements
+    - Refactor: add a global.css to share variables and styles across webviews.
+
 ## [0.1.5] 21.01.2024
 - Update README (replace preview image with gif, add mssql as supported database system)
 

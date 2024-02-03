@@ -1,13 +1,13 @@
-import { Uri, commands } from "vscode";
-import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from "..";
-import { ExtensionStorage, getIconDarkLightPaths } from "../../common";
+import { Uri, commands } from "vscode"
+import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
+import { ExtensionStorage, getIconDarkLightPaths } from "../../common"
 
 export function renderHelpApp(extensionUri: Uri, storage: ExtensionStorage) {
-    const id = `stats`;
-    let app = getApp(id);
+    const id = `stats`
+    let app = getApp(id)
     if (app) {
         // close old edit connection panel
-        app.panel?.dispose();
+        app.panel?.dispose()
     }
 
     app = {
@@ -18,16 +18,16 @@ export function renderHelpApp(extensionUri: Uri, storage: ExtensionStorage) {
         iconPath: getIconDarkLightPaths(extensionUri, 'help.svg'),
         htmlBody: getHtmlBody(),
         storage,
-    };
+    }
 
-    renderWebviewApp(extensionUri, app);
+    renderWebviewApp(extensionUri, app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
-    const { command, payload } = message;
+    const { command, payload } = message
 
     if (command === "workbench.action.openSettings") {
-        commands.executeCommand(command, payload);
+        commands.executeCommand(command, payload)
     }
 }
 
@@ -39,5 +39,5 @@ function getHtmlBody(): string {
         <vscode-link href="#" id="go-to-settings">Open UI Settings</vscode-link>
         <vscode-link href="https://github.com/otis11/SmileDB/blob/main/docs/usage.md">Documentation [GitHub]</vscode-link>
     </div>
-    `;
+    `
 }
