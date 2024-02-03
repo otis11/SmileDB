@@ -35,8 +35,8 @@
         "esbuild-base": "node esbuild.js",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-        "test-compile": "tsc -p ./",
-        "lint": "eslint src --fix --ext ts,js",
+        "lint": "eslint src --fix --ext ts,js && npm run type",
+        "type": "tsc --noEmit -p .",
         "rebuild": " ./node_modules/.bin/electron-rebuild -v \"22.3.14\""
     },
     "contributes": {
