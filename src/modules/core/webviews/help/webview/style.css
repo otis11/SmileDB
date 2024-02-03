@@ -1,27 +1,6 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--vscode-editor-font-family, --vscode-font-family);
-}
-
-:root {
-    --color-error: #f97583;
-    --color-success: rgb(115, 201, 145);
-    --color-divider: rgba(255, 255, 255, .1);
-}
-
 .table-of-contents {
     display: flex;
     flex-direction: column;
     padding: 20px;
     gap: 8px;
-}
-
-h4 {
-    padding-top: 8px;
-}
-
-h2 {
-    padding-top: 16px;
 }

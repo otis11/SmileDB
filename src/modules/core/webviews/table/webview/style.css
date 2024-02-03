@@ -1,43 +1,5 @@
-:root {
-    --table-col-width: 180px;
-    --color-row-selected: rgba(255, 255, 255, .03);
-    --color-vertical-divider: rgba(255, 255, 255, .1);
-    --color-row-delete: rgba(249, 117, 131, 0.2);
-    --color-row-add: rgba(115, 201, 145, 0.2);
-    --color-col-change: rgba(184, 149, 0, 0.2);
-    --color-col-selected: #007acc;
-
-    --color-background: var(--vscode-editor-background, #24292e);
-    --font-family: var(--vscode-editor-font-family, --vscode-font-family);
-    --color-primary: var(--vscode-editorIndentGuide-background, #2f363d);
-    --color-error: var(--vscode-errorForeground, #f97583);
-    --color-foreground: var(--vscode-editor-foreground, #e1e4e8);
-    --color-success: var(--vscode-testing-iconPassed, rgb(115, 201, 145));
-    --color-disabled: var(--vscode-disabledForeground, #cccccc80);
-    --color-search-result: var(--vscode-editor-findMatchHighlightBackground, #b89500);
-}
-
-* {
-    font-family: var(--font-family);
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 .row {
     display: flex;
-}
-
-.d-none {
-    display: none !important;
-}
-
-.error {
-    color: var(--color-error);
-}
-
-.success {
-    color: var(--color-success);
 }
 
 body {
@@ -129,19 +91,6 @@ body {
 #error-message-container .codicon {
     font-size: 20px;
     margin-top: 2px;
-}
-
-.vertical-divider {
-    height: 16px;
-    margin: 0 8px;
-    width: 1px;
-    background-color: var(--color-vertical-divider);
-}
-
-.horizontal-divider {
-    height: 1px;
-    width: 100%;
-    background-color: var(--color-vertical-divider);
 }
 
 #error-message {
@@ -298,7 +247,7 @@ vscode-text-field {
 }
 
 .col.col--selected {
-    background-color: var(--vscode-inputOption-activeBorder, var(--color-col-selected));
+    background-color: var(--color-col-selected);
 }
 
 .col:empty:before {
@@ -423,7 +372,7 @@ vscode-text-field {
 }
 
 #table .row .row-number.col--selected {
-    background: var(--vscode-inputOption-activeBorder, var(--color-col-selected));
+    background: var(--color-col-selected);
 }
 
 #error-close {

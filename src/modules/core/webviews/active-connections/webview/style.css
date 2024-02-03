@@ -1,24 +1,3 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--vscode-editor-font-family, --vscode-font-family);
-}
-
-:root {
-    --color-error: #f97583;
-    --color-success: rgb(115, 201, 145);
-    --color-divider: rgba(255, 255, 255, .1);
-}
-
-.error {
-    color: var(--vscode-errorForeground, var(--color-error));
-}
-
-.success {
-    color: var(--vscode-testing-iconPassed, var(--color-success));
-}
-
 nav {
     padding: 20px 0;
     display: flex;

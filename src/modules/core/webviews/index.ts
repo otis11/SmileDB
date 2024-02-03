@@ -69,6 +69,7 @@ function onDisposePanel(app: WebviewApp) {
 
 function buildHtml(extensionUri: Uri, panel: WebviewPanel, webviewPath: string[], body?: string) {
     const styleUri = getUri(panel.webview, extensionUri, ["dist", "webviews", ...webviewPath, "webview", "style.css"]);
+    const globalStyleUri = getUri(panel.webview, extensionUri, ["dist", "webviews", "global.css"]);
     const scriptUri = getUri(panel.webview, extensionUri, ["dist", "webviews", ...webviewPath, "webview", "index.js"]);
     const codiconsUri = getUri(panel.webview, extensionUri, ['dist', 'codicons', 'codicon.css']);
     const nonce = getNonce();
@@ -83,6 +84,7 @@ function buildHtml(extensionUri: Uri, panel: WebviewPanel, webviewPath: string[]
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${panel.webview.cspSource}; style-src ${panel.webview.cspSource}; script-src 'nonce-${nonce}';">
         <script src="${scriptUri}" nonce="${nonce}" type="module" defer></script>
+        <link rel="stylesheet" href="${globalStyleUri}">
         <link rel="stylesheet" href="${styleUri}">
         <link rel="stylesheet" href="${codiconsUri}">
         </head>

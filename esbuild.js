@@ -11,7 +11,10 @@ const FLAGS = {
 
 (async () => {
     // build webviews
-    const webviewFiles = getFilesRecursive('./src/modules/core/webviews', '/webview/');
+    // example: dist/webviews/help/webview/style.css
+    const webviewFiles = getFilePathsRecursive('./src/modules/core/webviews', '/webview/');
+    // add global css
+    webviewFiles.push('./src/modules/core/webviews/global.css')
     for (let i = 0; i < webviewFiles.length; i++) {
         await build({
             entryPoints: [
@@ -59,7 +62,7 @@ const FLAGS = {
     });
 })();
 
-function getFilesRecursive(root, filePathIncludes) {
+function getFilePathsRecursive(root, filePathIncludes) {
     let filesFiltered = [];
     const files = fs.readdirSync(root);
     for (let i = 0; i < files.length; i++) {
@@ -67,7 +70,7 @@ function getFilesRecursive(root, filePathIncludes) {
         const stat = fs.lstatSync(filePath);
         if (stat.isDirectory()) {
             filesFiltered = [
-                ...getFilesRecursive(filePath, filePathIncludes),
+                ...getFilePathsRecursive(filePath, filePathIncludes),
                 ...filesFiltered
             ];
         }
