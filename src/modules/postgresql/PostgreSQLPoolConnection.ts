@@ -102,6 +102,36 @@ export class PostgreSQLPoolConnection implements PoolConnection {
         }
     }
 
+    async fetchViews() {
+        const timer = new Timer()
+        const queryResult = await this.pool.query(`SELECT table_name
+                                            FROM information_schema.views
+                                            WHERE table_schema = '${this.config.connection.schema}'
+                                            AND table_catalog = '${this.config.connection.database}'
+                                            ORDER BY table_name`)
+        return {
+            fields: this.createQueryResultFields(queryResult.fields, {}),
+            rows: queryResult.rows,
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+    async fetchDatabaseStats() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT
+                                            (select count(*) from information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totaltables,
+                                            (select count(*) from information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totalviews
+                                           `)
+        return {
+            fields: this.createQueryResultFields(queryResult.fields, {}),
+            rows: queryResult.rows,
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
     private createQueryResultField(field: FieldDef, fieldConstraintsHashMap: FieldConstraintsHashMap): QueryResultField {
         const constraints: QueryResultFieldFlag[] = []
         if (fieldConstraintsHashMap[field.name]?.is_auto_increment === 'YES') {
