@@ -2,10 +2,19 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState } from "vscode"
 import { PoolConnectionConfig } from "../types"
 
 export class FolderTreeItem extends TreeItem {
-    constructor(label: string, contextValue: string, public connectionConfig: PoolConnectionConfig, description?: string) {
-        super(label, TreeItemCollapsibleState.Collapsed)
+    public connectionConfig: PoolConnectionConfig
+
+    constructor(config: {
+        label: string,
+        contextValue: string,
+        connectionConfig: PoolConnectionConfig,
+        description?: string,
+        state?: TreeItemCollapsibleState
+    }) {
+        super(config.label, config.state !== undefined ? config.state : TreeItemCollapsibleState.Collapsed)
         this.iconPath = new ThemeIcon('folder')
-        this.contextValue = contextValue
-        this.description = description
+        this.contextValue = config.contextValue
+        this.description = config.description
+        this.connectionConfig = config.connectionConfig
     }
 }

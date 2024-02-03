@@ -1,4 +1,4 @@
-import { TreeItem } from "vscode"
+import { TreeItem, TreeItemCollapsibleState } from "vscode"
 import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, TableTreeItem, getPoolConnection } from "../core"
 import { MySQLPoolConnection } from "./MySQLPoolConnection"
 
@@ -22,16 +22,20 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
         const connection = getPoolConnection(item.connectionConfig) as MySQLPoolConnection
         const { rows } = await connection.fetchDatabaseStats()
         return [
-            new FolderTreeItem(
-                "tables",
-                "tableFolder",
-                item.connectionConfig,
-                rows[0].TotalTables?.toString()),
-            new FolderTreeItem(
-                "views",
-                "viewFolder",
-                item.connectionConfig,
-                rows[0].TotalViews?.toString()),
+            new FolderTreeItem({
+                label: "tables",
+                contextValue: "tableFolder",
+                description: rows[0].TotalTables?.toString(),
+                connectionConfig: item.connectionConfig,
+                state: rows[0].TotalTables > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+            }),
+            new FolderTreeItem({
+                label: "views",
+                contextValue: "viewFolder",
+                connectionConfig: item.connectionConfig,
+                description: rows[0].TotalViews?.toString(),
+                state: rows[0].TotalViews > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+            }),
         ]
     }
 
