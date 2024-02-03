@@ -1,6 +1,5 @@
-import { ThemeColor, ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from "vscode"
-import { PoolConnectionConfig, QueryConfigBase } from "../types"
-import { getIconDarkLightPaths } from "../common"
+import { ThemeColor, ThemeIcon, TreeItem, TreeItemCollapsibleState } from "vscode"
+import { PoolConnectionConfig } from "../types"
 
 export class ErrorTreeItem extends TreeItem {
     constructor(

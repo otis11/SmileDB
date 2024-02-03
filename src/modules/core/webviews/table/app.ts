@@ -1,12 +1,11 @@
 import { writeFileSync } from "fs"
-import { Uri, commands, window, workspace } from "vscode"
+import { commands, window, workspace } from "vscode"
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
 import { config } from "../../../../config"
 import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common"
 import { PoolConnectionConfig } from "../../types"
 
 export function renderTableApp(
-    extensionUri: Uri,
     config: PoolConnectionConfig,
     table: string,
 ) {
@@ -22,13 +21,13 @@ export function renderTableApp(
         title: `${table} - ${config.connection.database} - ${config.name}`,
         webviewPath: ['table'],
         onWebviewMessage,
-        iconPath: getIconDarkLightPaths(extensionUri, 'table.svg'),
+        iconPath: getIconDarkLightPaths('table.svg'),
         htmlBody: getHtmlBody(config),
         connectionConfig: config,
         table,
     }
 
-    renderWebviewApp(extensionUri, app)
+    renderWebviewApp(app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {

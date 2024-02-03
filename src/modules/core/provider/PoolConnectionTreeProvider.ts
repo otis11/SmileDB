@@ -1,17 +1,11 @@
-import { TreeItem, TreeDataProvider, TreeItemCollapsibleState, EventEmitter, Event, Uri } from 'vscode'
-import { ExtensionStorage, getConnectionClientModule, getPoolConnection, getPoolConnectionConfigs } from '../common'
-import { PoolConnectionConfig } from '../types'
-import { PoolConnectionTreeItem } from './PoolConnectionTreeItem'
-import { GlobalTreeItem } from './GlobalTreeItem'
-import { WorkspaceTreeItem } from './WorkspaceTreeItem'
+import { Event, EventEmitter, TreeDataProvider, TreeItem } from 'vscode'
+import { getConnectionClientModule, getPoolConnectionConfigs } from '../common'
 import { ErrorTreeItem } from './ErrorTreeItem'
+import { GlobalTreeItem } from './GlobalTreeItem'
+import { PoolConnectionTreeItem } from './PoolConnectionTreeItem'
+import { WorkspaceTreeItem } from './WorkspaceTreeItem'
 
 export class PoolConnectionTreeProvider implements TreeDataProvider<TreeItem> {
-    constructor(
-        private readonly extensionUri: Uri,
-        private readonly storage: ExtensionStorage
-    ) { }
-
     getTreeItem(element: TreeItem): TreeItem {
         return element
     }
@@ -27,36 +21,32 @@ export class PoolConnectionTreeProvider implements TreeDataProvider<TreeItem> {
 
         else if (element instanceof WorkspaceTreeItem) {
             return Promise.resolve(
-                getPoolConnectionConfigs(this.storage).map(c => {
-                    return new PoolConnectionTreeItem(this.extensionUri, c)
+                getPoolConnectionConfigs().map(c => {
+                    return new PoolConnectionTreeItem(c)
                 })
             )
         }
 
         else if (element instanceof GlobalTreeItem) {
             return Promise.resolve(
-                getPoolConnectionConfigs(this.storage, true).map(c => {
-                    return new PoolConnectionTreeItem(this.extensionUri, c)
+                getPoolConnectionConfigs(true).map(c => {
+                    return new PoolConnectionTreeItem(c)
                 })
             )
         }
-
-        // @ts-ignore
-        if (!element.connectionConfig?.moduleName) {
+        const el = element as PoolConnectionTreeItem
+        if (!el.connectionConfig?.moduleName) {
             return Promise.resolve([])
         }
 
         try {
             // module resolves now the children
-            // @ts-ignore
-            const module = getConnectionClientModule(element.connectionConfig.moduleName)
-            // @ts-ignore
-            const items = await module.getDatabaseTreeChildren(this.extensionUri, element)
+            const module = getConnectionClientModule(el.connectionConfig.moduleName)
+            const items = await module.getDatabaseTreeChildren(el)
             return Promise.resolve(items)
         } catch (e: any) {
             // generic error tree item when module throws error
-            // @ts-ignore
-            return Promise.resolve([new ErrorTreeItem(e.message, element.connectionConfig)])
+            return Promise.resolve([new ErrorTreeItem(e.message, el.connectionConfig)])
         }
 
     }

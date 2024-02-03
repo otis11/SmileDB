@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
-import { ExtensionContext } from 'vscode'
-import { ExtensionStorage, copyToClipboard, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common'
+import { copyToClipboard, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common'
 import { PoolConnectionTreeProvider, } from './provider'
 import { Module, PoolConnectionConfig } from './types'
 import { renderActiveConnectionsApp } from './webviews/active-connections/app'
@@ -10,29 +9,27 @@ import { renderTableApp } from './webviews/table/app'
 
 export const coreModule: Module = {
     name: 'Core',
-    install(context: ExtensionContext) {
-        const extensionStorage = new ExtensionStorage(context.globalState, context.workspaceState)
-
+    install() {
         // tree views
-        const databaseConnectionsProvider = new PoolConnectionTreeProvider(context.extensionUri, extensionStorage)
+        const databaseConnectionsProvider = new PoolConnectionTreeProvider()
         vscode.window.createTreeView('SmileDB', {
             treeDataProvider: databaseConnectionsProvider,
         })
 
         //commands
-        registerCommand('SmileDB.editConnection', context, async (treeItem) => {
+        registerCommand('SmileDB.editConnection', async (treeItem) => {
             if (treeItem) {
-                renderEditConnectionApp(context.extensionUri, treeItem.connectionConfig, extensionStorage)
+                renderEditConnectionApp(treeItem.connectionConfig)
 
             } else {
-                const connectionConfig = await showQuickPickConnectionConfigs(extensionStorage)
+                const connectionConfig = await showQuickPickConnectionConfigs()
 
                 if (connectionConfig) {
-                    renderEditConnectionApp(context.extensionUri, connectionConfig, extensionStorage)
+                    renderEditConnectionApp(connectionConfig)
                 }
             }
         })
-        registerCommand('SmileDB.openTable', context, (
+        registerCommand('SmileDB.openTable', (
             config: PoolConnectionConfig,
             table: string,
         ) => {
@@ -43,32 +40,31 @@ export const coreModule: Module = {
             }
 
             renderTableApp(
-                context.extensionUri,
                 config,
                 table,
             )
         })
-        registerCommand('SmileDB.deleteConnection', context, async (treeItem) => {
+        registerCommand('SmileDB.deleteConnection', async (treeItem) => {
             if (treeItem) {
-                deletePoolConnectionConfig(treeItem.connectionConfig, extensionStorage)
+                deletePoolConnectionConfig(treeItem.connectionConfig)
             } else {
-                const connectionConfig = await showQuickPickConnectionConfigs(extensionStorage)
+                const connectionConfig = await showQuickPickConnectionConfigs()
 
                 if (connectionConfig) {
-                    deletePoolConnectionConfig(connectionConfig, extensionStorage)
+                    deletePoolConnectionConfig(connectionConfig)
                 }
             }
             vscode.commands.executeCommand('SmileDB.refreshConnectionsSilent')
             showMessage('Connection deleted')
         })
-        registerCommand('SmileDB.refreshConnections', context, (treeItem) => {
+        registerCommand('SmileDB.refreshConnections', (treeItem) => {
             databaseConnectionsProvider.refresh()
             showMessage('Connections refreshed')
         })
-        registerCommand('SmileDB.refreshConnectionsSilent', context, () => {
+        registerCommand('SmileDB.refreshConnectionsSilent', () => {
             databaseConnectionsProvider.refresh()
         })
-        registerCommand('SmileDB.newConnection', context, async () => {
+        registerCommand('SmileDB.newConnection', async () => {
             const modules = getConnectionClientModules().map(d => d.name)
             const databaseModuleName = await vscode.window.showQuickPick(
                 modules,
@@ -77,21 +73,21 @@ export const coreModule: Module = {
                 })
             if (databaseModuleName) {
                 const module = getConnectionClientModule(databaseModuleName)
-                renderEditConnectionApp(context.extensionUri, module.defaultPoolConnectionConfig, extensionStorage)
+                renderEditConnectionApp(module.defaultPoolConnectionConfig)
             }
         })
-        registerCommand('SmileDB.resetConnectionStorage', context, () => {
-            resetPoolConnectionConfigs(extensionStorage)
+        registerCommand('SmileDB.resetConnectionStorage', () => {
+            resetPoolConnectionConfigs()
         })
 
-        registerCommand('SmileDB.openActiveConnections', context, () => {
-            renderActiveConnectionsApp(context.extensionUri, extensionStorage)
+        registerCommand('SmileDB.openActiveConnections', () => {
+            renderActiveConnectionsApp()
         })
 
-        registerCommand('SmileDB.help', context, () => {
-            renderHelpApp(context.extensionUri, extensionStorage)
+        registerCommand('SmileDB.help', () => {
+            renderHelpApp()
         })
-        registerCommand('SmileDB.copyTreeItemLabel', context, (treeItem) => {
+        registerCommand('SmileDB.copyTreeItemLabel', (treeItem) => {
             if (treeItem instanceof vscode.TreeItem) {
                 copyToClipboard(treeItem.label?.toString() || '')
             } else {

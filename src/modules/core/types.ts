@@ -1,4 +1,4 @@
-import { ExtensionContext, TreeItem, Uri } from "vscode"
+import { TreeItem } from "vscode"
 import { PoolConnectionTreeItem } from "./provider"
 
 export interface PoolConnection {
@@ -88,13 +88,13 @@ export type ModuleName = string
 
 export type Module = {
     name: ModuleName
-    install?: (context: ExtensionContext) => void
+    install?: () => void
 }
 
 export type ConnectionClientModule = Module & {
     defaultPoolConnectionConfig: DefaultPoolConnectionConfig
     createPoolConnection(config: PoolConnectionConfig): PoolConnection
-    getDatabaseTreeChildren(exntesionUri: Uri, item: PoolConnectionTreeItem): Promise<TreeItem[]>
+    getDatabaseTreeChildren(item: PoolConnectionTreeItem): Promise<TreeItem[]>
     icon: string,
     iconActive: string,
 }

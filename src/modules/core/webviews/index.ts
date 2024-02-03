@@ -1,5 +1,6 @@
 import { Disposable, Uri, ViewColumn, WebviewPanel, window } from "vscode"
-import { ExtensionStorage, getIconDarkLightPaths, getNonce, getUri } from "../common"
+import { getExtensionUri } from "../../../global"
+import { getIconDarkLightPaths, getNonce, getUri } from "../common"
 import { PoolConnectionConfig } from "../types"
 
 export interface WebviewApp {
@@ -13,7 +14,6 @@ export interface WebviewApp {
     panel?: WebviewPanel,
     connectionConfig?: PoolConnectionConfig
     table?: string,
-    storage?: ExtensionStorage
 }
 
 export type WebviewAppMessage = {
@@ -23,7 +23,8 @@ export type WebviewAppMessage = {
 
 const webviewApps: WebviewApp[] = []
 
-export function renderWebviewApp(extensionUri: Uri, app: WebviewApp) {
+export function renderWebviewApp(app: WebviewApp) {
+    const extensionUri = getExtensionUri()
     const panel = window.createWebviewPanel(
         app.id,
         app.title,
@@ -45,7 +46,7 @@ export function renderWebviewApp(extensionUri: Uri, app: WebviewApp) {
 
     panel.onDidDispose(() => onDisposePanel(app), null, app.disposables)
     panel.iconPath = app.iconPath
-    panel.webview.html = buildHtml(extensionUri, panel, app.webviewPath, app.htmlBody)
+    panel.webview.html = buildHtml(panel, app.webviewPath, app.htmlBody)
     panel.webview.onDidReceiveMessage((e: WebviewAppMessage) => app.onWebviewMessage(app, e))
 
     app.panel = panel
@@ -67,11 +68,11 @@ function onDisposePanel(app: WebviewApp) {
 }
 
 
-function buildHtml(extensionUri: Uri, panel: WebviewPanel, webviewPath: string[], body?: string) {
-    const styleUri = getUri(panel.webview, extensionUri, ["dist", "webviews", ...webviewPath, "webview", "style.css"])
-    const globalStyleUri = getUri(panel.webview, extensionUri, ["dist", "webviews", "global.css"])
-    const scriptUri = getUri(panel.webview, extensionUri, ["dist", "webviews", ...webviewPath, "webview", "index.js"])
-    const codiconsUri = getUri(panel.webview, extensionUri, ['dist', 'codicons', 'codicon.css'])
+function buildHtml(panel: WebviewPanel, webviewPath: string[], body?: string) {
+    const styleUri = getUri(panel.webview, ["dist", "webviews", ...webviewPath, "webview", "style.css"])
+    const globalStyleUri = getUri(panel.webview, ["dist", "webviews", "global.css"])
+    const scriptUri = getUri(panel.webview, ["dist", "webviews", ...webviewPath, "webview", "index.js"])
+    const codiconsUri = getUri(panel.webview, ['dist', 'codicons', 'codicon.css'])
     const nonce = getNonce()
 
     // Tip: Install the es6-string-html VS Code extension to enable code highlighting below

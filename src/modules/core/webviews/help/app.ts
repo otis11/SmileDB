@@ -1,8 +1,8 @@
-import { Uri, commands } from "vscode"
+import { commands } from "vscode"
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
-import { ExtensionStorage, getIconDarkLightPaths } from "../../common"
+import { getIconDarkLightPaths } from "../../common"
 
-export function renderHelpApp(extensionUri: Uri, storage: ExtensionStorage) {
+export function renderHelpApp() {
     const id = `stats`
     let app = getApp(id)
     if (app) {
@@ -15,12 +15,11 @@ export function renderHelpApp(extensionUri: Uri, storage: ExtensionStorage) {
         title: "SmileDB Help",
         webviewPath: ['help'],
         onWebviewMessage,
-        iconPath: getIconDarkLightPaths(extensionUri, 'help.svg'),
+        iconPath: getIconDarkLightPaths('help.svg'),
         htmlBody: getHtmlBody(),
-        storage,
     }
 
-    renderWebviewApp(extensionUri, app)
+    renderWebviewApp(app)
 }
 
 async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {

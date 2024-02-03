@@ -1,9 +1,10 @@
-import { makeStringUnique } from "./helper"
-import { PoolConnectionConfig } from "../types"
-import { ExtensionStorage } from "./storage"
 import * as vscode from 'vscode'
+import { getStorage } from "../../../global"
+import { PoolConnectionConfig } from "../types"
+import { makeStringUnique } from "./helper"
 
-export function storePoolConnectionConfig(config: PoolConnectionConfig, storage: ExtensionStorage) {
+export function storePoolConnectionConfig(config: PoolConnectionConfig) {
+    const storage = getStorage()
     const lastConnectionId = storage.get("lastConnectionId", true) as number || 1
 
     const connectionsWorkspace = storage.get("connections") as PoolConnectionConfig[] || []
@@ -31,31 +32,33 @@ export function storePoolConnectionConfig(config: PoolConnectionConfig, storage:
     return config.id
 }
 
-export function deletePoolConnectionConfig(config: PoolConnectionConfig, storage: ExtensionStorage) {
+export function deletePoolConnectionConfig(config: PoolConnectionConfig) {
+    const storage = getStorage()
     let connections = storage.get("connections", config.advanced.global) as PoolConnectionConfig[] || []
     connections = connections.filter(c => c.name !== config.name)
     storage.store("connections", connections, config.advanced.global)
 }
 
-export function resetPoolConnectionConfigs(storage: ExtensionStorage) {
+export function resetPoolConnectionConfigs() {
+    const storage = getStorage()
     storage.store("connections", [])
     storage.store("connections", [], true)
     storage.store("lastConnectionId", 0)
 }
 
-export function getPoolConnectionConfigs(storage: ExtensionStorage, useGlobal = false) {
-    return storage.get("connections", useGlobal) as PoolConnectionConfig[] || []
+export function getPoolConnectionConfigs(useGlobal = false) {
+    return getStorage().get("connections", useGlobal) as PoolConnectionConfig[] || []
 }
 
-export function getPoolConnectionConfigsAll(storage: ExtensionStorage) {
+export function getPoolConnectionConfigsAll() {
     return [
-        ...getPoolConnectionConfigs(storage),
-        ...getPoolConnectionConfigs(storage, true)
+        ...getPoolConnectionConfigs(),
+        ...getPoolConnectionConfigs(true)
     ]
 }
 
-export async function showQuickPickConnectionConfigs(storage: ExtensionStorage): Promise<PoolConnectionConfig | undefined> {
-    const connectionConfigs = getPoolConnectionConfigsAll(storage)
+export async function showQuickPickConnectionConfigs(): Promise<PoolConnectionConfig | undefined> {
+    const connectionConfigs = getPoolConnectionConfigsAll()
     const selected = await vscode.window.showQuickPick(
         [
             ...connectionConfigs.map(c => ({
