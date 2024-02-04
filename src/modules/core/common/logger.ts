@@ -1,4 +1,4 @@
-import { config } from '../../../config'
+import { getConfig } from '../../../config'
 
 export enum LogLevel {
     debug = 0,
@@ -8,7 +8,7 @@ export enum LogLevel {
 }
 
 function log(logLevel: LogLevel, ...args: any[]) {
-    if (logLevel >= config.general.logLevel) {
+    if (logLevel >= getConfig().general.logLevel) {
         console.log(
             getLogLevelColor(logLevel) + LogLevel[logLevel].toUpperCase() + ' \x1b[0m',
             ...args

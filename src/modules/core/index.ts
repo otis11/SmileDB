@@ -73,7 +73,7 @@ export const coreModule: Module = {
                 })
             if (databaseModuleName) {
                 const module = getConnectionClientModule(databaseModuleName)
-                renderEditConnectionApp(module.defaultPoolConnectionConfig)
+                renderEditConnectionApp(module.getDefaultPoolConnectionConfig())
             }
         })
         registerCommand('SmileDB.resetConnectionStorage', () => {
