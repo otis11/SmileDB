@@ -1,23 +1,24 @@
 # Change Log
 
-## [0.1.6] Unreleased
+## [0.2.0] 04.02.2024
 - Settings
-    - add `defaults.stayAliveInSeconds`
-    - add `defaults.saveAuthentication`
-    - add `defaults.trustServerCertificate`
+    - Make setting changes take effect without reloading vscode [#11](https://github.com/otis11/SmileDB/pull/11)
+    - add `defaults.stayAliveInSeconds` [#10](https://github.com/otis11/SmileDB/pull/10)
+    - add `defaults.saveAuthentication` [#10](https://github.com/otis11/SmileDB/pull/10)
+    - add `defaults.trustServerCertificate` [#10](https://github.com/otis11/SmileDB/pull/10)
 - Database Tree
     - List `tables` and `views` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL`
-    - List `procedures` and `functions` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL` (Just list them, no interaction yet)
-    - List `collections` and `views` inside the tree view under extra folders for: `MongoDB`
-    - Add the count of total `collections`, `tables` or `views` to each folder. If the count is 0, make the TreeItem not expandable.
+    - List `procedures` and `functions` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL` (Just list them, no interaction yet) [4c6c5db](https://github.com/otis11/SmileDB/commit/4c6c5db5a6b65b18173a7660ba1d4943dfd50088)
+    - List `collections` and `views` inside the tree view under extra folders for: `MongoDB` [26f407b](https://github.com/otis11/SmileDB/commit/26f407b593f776b8c752a4ab0820c2ef394f4f8d)
+    - Add the count of total `collections`, `tables` or `views` to each folder. If the count is 0, make the TreeItem not expandable. [2e713ad](https://github.com/otis11/SmileDB/commit/2e713ada91e393abfd0264382493c5561d290fbb)
 - Theme
     - improve the background colors adopted from VSCode Color Theme (before some were transparent which caused visual issues)
 - Table View
     - Increase the min height for the query input field
 - Code Improvements
-    - Use `MySQLPoolConnection` and `getDatabaseTreeChildren` from `MySQL` for `MariaDB` as the `MariaDBPoolConnection` and `getDatabaseTreeChildren` was exactly the same. (They are removed)
-    - Refactor: make extension context and storage global available (`global.ts`)
-    - Refactor: add a global.css to share variables and styles across webviews.
+    - Use `MySQLPoolConnection` and `getDatabaseTreeChildren` from `MySQL` for `MariaDB` as the `MariaDBPoolConnection` and `getDatabaseTreeChildren` was exactly the same. (They are removed) [c2f3de3](https://github.com/otis11/SmileDB/commit/c2f3de3fdca973497a4e027221da8b0b72869741)
+    - Refactor: make extension context and storage global available (`global.ts`) [#7](https://github.com/otis11/SmileDB/pull/7)
+    - Refactor: add a global.css to share variables and styles across webviews. [fdd81f2](https://github.com/otis11/SmileDB/commit/fdd81f2fd0512a441b62c1fc382d5e57f4d8d58b)
     - Improve eslint config
 
 ## [0.1.5] 21.01.2024
@@ -55,5 +56,5 @@
 - Add copy label option to tree view items [52fef56](https://github.com/otis11/SmileDB/commit/52fef56e1d1950eff8a029b5e8e3e2a95dcbee1e)
 - Add copy selected columns to clipboard support `Ctrl + c` (format: `CSV`) [de71fcc](https://github.com/otis11/SmileDB/commit/de71fcc40c1a0367c5ed07351049451df6dc5655)
 
-## [0.1.0] Unreleased
+## [0.1.0]
 - Initial Release
