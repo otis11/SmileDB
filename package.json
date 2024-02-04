@@ -204,7 +204,7 @@
                 "SmileDB.defaults.stayAliveInSeconds": {
                     "default": 60,
                     "type": "integer",
-                    "description": "How many seconds a database connection should be kept alive until closing it (takes effect only for new connections). (Active connections can be viewed via the command palette: \"Open Active Database Connections\")"
+                    "description": "When creating a new connection, how many seconds a database connection should be kept alive until closing it. (Active connections can be viewed via the command palette: \"Open Active Database Connections\")"
                 }
             }
         }
