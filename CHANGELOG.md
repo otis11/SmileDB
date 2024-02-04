@@ -1,10 +1,14 @@
 # Change Log
 
 ## [0.1.6] Unreleased
-- List `tables` and `views` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL`
-- List `collections` and `views` inside the tree view under extra folders for: `MongoDB`
-- Add the count of total `collections`, `tables` or `views` to each folder. If the count is 0, make the TreeItem not expandable.
-- Theme: improve the background colors adopted from VSCode Color Theme (before some were transparent which caused visual issues)
+- Database Tree
+    - List `tables` and `views` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL`
+    - List `collections` and `views` inside the tree view under extra folders for: `MongoDB`
+    - Add the count of total `collections`, `tables` or `views` to each folder. If the count is 0, make the TreeItem not expandable.
+- Theme
+    - improve the background colors adopted from VSCode Color Theme (before some were transparent which caused visual issues)
+- Table View
+    - Increase the min height for the query input field
 - Code Improvements
     - Use `MySQLPoolConnection` and `getDatabaseTreeChildren` from `MySQL` for `MariaDB` as the `MariaDBPoolConnection` and `getDatabaseTreeChildren` was exactly the same. (They are removed)
     - Refactor: make extension context and storage global available (`global.ts`)

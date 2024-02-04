@@ -388,7 +388,7 @@ vscode-text-field {
     resize: vertical;
     width: 100%;
     padding: 8px 4px;
-    min-height: 68px;
+    min-height: 100px;
 }
 
 #header-filter-query {
