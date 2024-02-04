@@ -1,6 +1,10 @@
 # Change Log
 
 ## [0.1.6] Unreleased
+- Settings
+    - add `defaults.stayAliveInSeconds`
+    - add `defaults.saveAuthentication`
+    - add `defaults.trustServerCertificate`
 - Database Tree
     - List `tables` and `views` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL`
     - List `procedures` and `functions` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL` (Just list them, no interaction yet)

@@ -190,6 +190,21 @@
                         "Edit"
                     ],
                     "description": "Select Mode lets you select multiple columns/rows and interact with them (for example delete multiple selected rows). Via double clicking on a field you can edit it. Edit Mode lets you edit each field directly."
+                },
+                "SmileDB.defaults.saveAuthentication": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When creating a new connection, should the \"Save Authentication\" box be checked by default."
+                },
+                "SmileDB.defaults.trustServerCertificate": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When creating a new connection, should the \"Trust the server certificate\" box be checked by default."
+                },
+                "SmileDB.defaults.stayAliveInSeconds": {
+                    "default": 60,
+                    "type": "integer",
+                    "description": "When creating a new connection, how many seconds a database connection should be kept alive until closing it. (Active connections can be viewed via the command palette: \"Open Active Database Connections\")"
                 }
             }
         }
