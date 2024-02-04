@@ -92,7 +92,7 @@ export type Module = {
 }
 
 export type ConnectionClientModule = Module & {
-    defaultPoolConnectionConfig: DefaultPoolConnectionConfig
+    getDefaultPoolConnectionConfig: () => DefaultPoolConnectionConfig
     createPoolConnection(config: PoolConnectionConfig): PoolConnection
     getDatabaseTreeChildren(item: PoolConnectionTreeItem): Promise<TreeItem[]>
     icon: string,

@@ -17,7 +17,7 @@ export function getNonce() {
 }
 
 import { ProgressLocation, Uri, Webview, commands, env, window } from "vscode"
-import { config } from '../../../config'
+import { getConfig } from '../../../config'
 import { getContext } from '../../../global'
 
 /**
@@ -63,6 +63,7 @@ export function getIconDarkLightPaths(icon: string) {
 }
 
 export async function showMessage(message: string, timeout = 2000) {
+    const config = getConfig()
     if (config.general.messageDisplay === 'Information Message') {
         await showInformationMessage(message, timeout)
     }

@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs"
 import { commands, window, workspace } from "vscode"
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
-import { config } from "../../../../config"
+import { getConfig } from "../../../../config"
 import { copyToClipboard, getIconDarkLightPaths, getPoolConnection, logWarn, showMessage } from "../../common"
 import { PoolConnectionConfig } from "../../types"
 
@@ -125,7 +125,7 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
     }
 
     if (command === "load.config") {
-        app.panel?.webview.postMessage({ command: `load.config`, payload: config })
+        app.panel?.webview.postMessage({ command: `load.config`, payload: getConfig() })
     }
 
     if (command === "workbench.action.openSettings") {
