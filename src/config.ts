@@ -15,9 +15,9 @@ export const config = {
     },
     connections: {
         defaults: {
-            stayAliveInSeconds: 60,
-            saveAuthentication: false,
-            trustServerCertificate: false,
+            stayAliveInSeconds: vsconfig.get('defaults.stayAliveInSeconds') as number,
+            saveAuthentication: vsconfig.get('defaults.saveAuthentication') as boolean,
+            trustServerCertificate: vsconfig.get('defaults.trustServerCertificate') as boolean,
             mysql: {
                 host: "localhost",
                 port: 3306,

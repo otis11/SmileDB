@@ -170,7 +170,7 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
                 <p>Trust the server certificate (Activate for local development or self signed certificates).</p>
              </div>
             <div class="row mb-3">
-                <vscode-checkbox id="trust-server-certificate" value="${connectionConfig.advanced.trustServerCertificate}">Trust the server certificate</vscode-checkbox>
+                <vscode-checkbox id="trust-server-certificate" checked="${connectionConfig.advanced.trustServerCertificate}">Trust the server certificate</vscode-checkbox>
             </div>
             <div class="row mb-3">
                 <vscode-text-field type="number" id="stay-alive-in-seconds" value="${connectionConfig.advanced.stayAliveInSeconds}">Connection stays alive for (in seconds). When used, the timer resets.</vscode-text-field>
