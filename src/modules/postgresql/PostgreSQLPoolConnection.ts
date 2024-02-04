@@ -117,11 +117,46 @@ export class PostgreSQLPoolConnection implements PoolConnection {
             },
         }
     }
+
+    async fetchProcedures() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT routine_name
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.schema}'
+                                            AND routine_catalog = '${this.config.connection.database}'
+                                            AND routine_type = 'PROCEDURE'`)
+        return {
+            fields: this.createQueryResultFields(queryResult.fields, {}),
+            rows: queryResult.rows,
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchFunctions() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT routine_name
+                                            from information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.schema}'
+                                            AND routine_catalog = '${this.config.connection.database}'
+                                            AND routine_type = 'FUNCTION'`)
+        return {
+            fields: this.createQueryResultFields(queryResult.fields, {}),
+            rows: queryResult.rows,
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
     async fetchDatabaseStats() {
         const timer = new Timer()
         const queryResult = await this.query(`SELECT
                                             (select count(*) from information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totaltables,
-                                            (select count(*) from information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totalviews
+                                            (select count(*) from information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totalviews,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as totalprocedures,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as totalfunctions
                                            `)
         return {
             fields: this.createQueryResultFields(queryResult.fields, {}),

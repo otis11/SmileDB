@@ -109,7 +109,9 @@ export class MSSQLPoolConnection implements PoolConnection {
         const timer = new Timer()
         const queryResult = await this.query(`SELECT
                                             (select count(*) from ${this.config.connection.database}.information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND TABLE_TYPE NOT LIKE 'VIEW') as TotalTables,
-                                            (select count(*) from ${this.config.connection.database}.information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}') as TotalViews
+                                            (select count(*) from ${this.config.connection.database}.information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}') as TotalViews,
+                                            (select count(*) from ${this.config.connection.database}.information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_type = 'PROCEDURE') as TotalProcedures,
+                                            (select count(*) from ${this.config.connection.database}.information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_type = 'FUNCTION') as TotalFunctions
                                            `)
         return {
             rows: this.getQueryResultRows(queryResult),
@@ -129,6 +131,36 @@ export class MSSQLPoolConnection implements PoolConnection {
         return {
             rows: this.getQueryResultRows(queryResult),
             fields: [this.createQueryResultField(queryResult.recordset.columns.TABLE_NAME as any)],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchProcedures() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT routine_name
+                                            FROM ${this.config.connection.database}.information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.schema}'
+                                            AND routine_type = 'PROCEDURE'`)
+        return {
+            rows: this.getQueryResultRows(queryResult),
+            fields: [this.createQueryResultField(queryResult.recordset.columns.routine_name as any)],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchFunctions() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT routine_name
+                                            FROM ${this.config.connection.database}.information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.schema}'
+                                            AND routine_type = 'FUNCTION'`)
+        return {
+            rows: this.getQueryResultRows(queryResult),
+            fields: [this.createQueryResultField(queryResult.recordset.columns.routine_name as any)],
             stats: {
                 timeInMilliseconds: timer.stop(),
             },

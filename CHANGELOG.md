@@ -3,6 +3,7 @@
 ## [0.1.6] Unreleased
 - Database Tree
     - List `tables` and `views` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL`
+    - List `procedures` and `functions` inside the tree view under extra folders for: `MariaDB`, `MySQL`, `PostgreSQL` and `MSSQL` (Just list them, no interaction yet)
     - List `collections` and `views` inside the tree view under extra folders for: `MongoDB`
     - Add the count of total `collections`, `tables` or `views` to each folder. If the count is 0, make the TreeItem not expandable.
 - Theme

@@ -1,5 +1,5 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
-import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, SchemaTreeItem, TableTreeItem, getPoolConnection } from "../core"
+import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, SchemaTreeItem, TableTreeItem, getPoolConnection } from "../core"
 import { PostgreSQLPoolConnection } from "./PostgreSQLPoolConnection"
 
 export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[]> {
@@ -51,6 +51,20 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
                 description: rows[0].totalviews?.toString(),
                 state: rows[0].totalviews > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
             }),
+            new FolderTreeItem({
+                label: "procedures",
+                contextValue: "procedureFolder",
+                connectionConfig: item.connectionConfig,
+                description: rows[0].totalprocedures.toString(),
+                state: rows[0].totalprocedures > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+            }),
+            new FolderTreeItem({
+                label: "functions",
+                contextValue: "functionFolder",
+                connectionConfig: item.connectionConfig,
+                description: rows[0].totalfunctions.toString(),
+                state: rows[0].totalfunctions > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+            })
         ]
     }
 
@@ -70,6 +84,24 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
             item.connectionConfig,
             row[fields[0].name]?.toString() || ''
         ))
+    }
+
+    else if (item instanceof FolderTreeItem && item.contextValue === 'procedureFolder') {
+        const connection = getPoolConnection(item.connectionConfig) as PostgreSQLPoolConnection
+        const { rows, fields } = await connection.fetchProcedures()
+        return rows.map(row => new ProcedureTreeItem({
+            connectionConfig: item.connectionConfig,
+            label: row[fields[0].name]?.toString() || ''
+        }))
+    }
+
+    else if (item instanceof FolderTreeItem && item.contextValue === 'functionFolder') {
+        const connection = getPoolConnection(item.connectionConfig) as PostgreSQLPoolConnection
+        const { rows, fields } = await connection.fetchFunctions()
+        return rows.map(row => new ProcedureTreeItem({
+            connectionConfig: item.connectionConfig,
+            label: row[fields[0].name]?.toString() || ''
+        }))
     }
 
     return []

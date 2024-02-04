@@ -1,5 +1,5 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
-import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, SchemaTreeItem, TableTreeItem, getPoolConnection } from "../core"
+import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, SchemaTreeItem, TableTreeItem, getPoolConnection } from "../core"
 import { MSSQLPoolConnection } from "./MSSQLPoolConnection"
 
 export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[]> {
@@ -37,6 +37,8 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
         const { rows } = await connection.fetchDatabaseStats()
         const totalTables = parseInt(rows[0].TotalTables?.toString() || "0")
         const totalViews = parseInt(rows[0].TotalViews?.toString() || "0")
+        const totalProcedures = parseInt(rows[0].TotalProcedures?.toString() || "0")
+        const totalFunctions = parseInt(rows[0].TotalFunctions?.toString() || "0")
         return [
             new FolderTreeItem({
                 label: "tables",
@@ -52,6 +54,20 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
                 description: totalViews.toString(),
                 state: totalViews > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
             }),
+            new FolderTreeItem({
+                label: "procedures",
+                contextValue: "procedureFolder",
+                connectionConfig: item.connectionConfig,
+                description: totalProcedures.toString(),
+                state: totalProcedures > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+            }),
+            new FolderTreeItem({
+                label: "functions",
+                contextValue: "functionFolder",
+                connectionConfig: item.connectionConfig,
+                description: totalFunctions.toString(),
+                state: totalFunctions > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+            })
         ]
     }
 
@@ -71,6 +87,24 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
             item.connectionConfig,
             row[fields[0].name]?.toString() || ''
         ))
+    }
+
+    else if (item instanceof FolderTreeItem && item.contextValue === 'procedureFolder') {
+        const connection = getPoolConnection(item.connectionConfig) as MSSQLPoolConnection
+        const { rows, fields } = await connection.fetchProcedures()
+        return rows.map(row => new ProcedureTreeItem({
+            connectionConfig: item.connectionConfig,
+            label: row[fields[0].name]?.toString() || ''
+        }))
+    }
+
+    else if (item instanceof FolderTreeItem && item.contextValue === 'functionFolder') {
+        const connection = getPoolConnection(item.connectionConfig) as MSSQLPoolConnection
+        const { rows, fields } = await connection.fetchFunctions()
+        return rows.map(row => new ProcedureTreeItem({
+            connectionConfig: item.connectionConfig,
+            label: row[fields[0].name]?.toString() || ''
+        }))
     }
 
     return []

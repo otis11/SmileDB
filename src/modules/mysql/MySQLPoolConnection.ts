@@ -75,11 +75,43 @@ export class MySQLPoolConnection implements PoolConnection {
         }
     }
 
+    async fetchProcedures() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT routine_name
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.database}'
+                                            AND routine_type = 'PROCEDURE'`)
+        return {
+            fields: [this.createQueryResultField(queryResult[1][0])],
+            rows: queryResult[0] as QueryResultRow[],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
+    async fetchFunctions() {
+        const timer = new Timer()
+        const queryResult = await this.query(`SELECT routine_name
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.database}'
+                                            AND routine_type = 'FUNCTION'`)
+        return {
+            fields: [this.createQueryResultField(queryResult[1][0])],
+            rows: queryResult[0] as QueryResultRow[],
+            stats: {
+                timeInMilliseconds: timer.stop(),
+            },
+        }
+    }
+
     async fetchDatabaseStats() {
         const timer = new Timer()
         const queryResult = await this.query(`SELECT
                                             (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE NOT LIKE 'VIEW') as TotalTables,
-                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as TotalViews
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as TotalViews,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as TotalProcedures,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as TotalFunctions
                                            `)
         return {
             fields: [this.createQueryResultField(queryResult[1][0])],
