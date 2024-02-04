@@ -74,3 +74,7 @@ export async function showQuickPickConnectionConfigs(): Promise<PoolConnectionCo
 
     return connectionConfigs.find(c => c.id === selected?.id)
 }
+
+export function identifier(config: PoolConnectionConfig) {
+    return `${config.id}.${config.connection.schema}.${config.connection.database}`
+}

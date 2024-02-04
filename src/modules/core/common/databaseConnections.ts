@@ -1,5 +1,6 @@
 import { commands } from "vscode"
 import { PoolConnection, PoolConnectionConfig } from "../types"
+import { identifier } from "./connectionConfig"
 import { logDebug } from "./logger"
 import { getConnectionClientModule } from "./module"
 
@@ -59,10 +60,6 @@ async function closePoolConnection(connection: ActiveDatabaseConnection | undefi
         delete poolConnectionsActive[identifier(config)]
         commands.executeCommand('SmileDB.refreshConnectionsSilent')
     }
-}
-
-function identifier(config: PoolConnectionConfig) {
-    return `${config.id}.${config.connection.schema}.${config.connection.database}`
 }
 
 export function getActiveConnectionConfigs() {

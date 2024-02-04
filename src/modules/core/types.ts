@@ -184,3 +184,8 @@ export type SQLQueryBuildConfig = {
     dbId: string,
     stringWrap?: string
 }
+
+export type DatabaseQuery = {
+    name: string,
+    query: string
+}
