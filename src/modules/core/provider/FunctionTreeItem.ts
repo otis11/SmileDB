@@ -1,4 +1,4 @@
-import { TreeItem, TreeItemCollapsibleState } from "vscode"
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState } from "vscode"
 import { PoolConnectionConfig } from "../types"
 
 export class FunctionTreeItem extends TreeItem {
@@ -9,7 +9,7 @@ export class FunctionTreeItem extends TreeItem {
         connectionConfig: PoolConnectionConfig,
     }) {
         super(config.label, TreeItemCollapsibleState.None)
-        // this.iconPath = new ThemeIcon('play')
+        this.iconPath = new ThemeIcon('settings-gear')
         this.connectionConfig = config.connectionConfig
         this.contextValue = 'function'
 

@@ -1,4 +1,4 @@
-import { TreeItem, TreeItemCollapsibleState } from "vscode"
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState } from "vscode"
 import { PoolConnectionConfig } from "../types"
 
 export class ProcedureTreeItem extends TreeItem {
@@ -9,7 +9,7 @@ export class ProcedureTreeItem extends TreeItem {
         connectionConfig: PoolConnectionConfig,
     }) {
         super(config.label, TreeItemCollapsibleState.None)
-        // this.iconPath = new ThemeIcon('play')
+        this.iconPath = new ThemeIcon('server-process')
         this.connectionConfig = config.connectionConfig
         this.contextValue = 'procedure'
 
