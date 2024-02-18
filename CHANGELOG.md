@@ -12,6 +12,7 @@
     (https://github.com/antares-sql/antares/issues/159).
 - Code Improvements
   - Make getDatabaseTreeItems shared between SQLPoolConnections
+  - Reduce code duplication inside specific PoolConnections
 
 ## [0.2.0] 04.02.2024
 
