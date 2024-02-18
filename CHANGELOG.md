@@ -1,7 +1,8 @@
 # Change Log
 
-## [0.2.1] 18.04.2024
+## [0.2.1] unreleased
 
+- Add inspect code view for procedures and functions
 - Database Tree
   - Make description for multiple tree items copyable
   - If loading the database stats fails for any sql connection inside the tree
@@ -12,7 +13,8 @@
     (https://github.com/antares-sql/antares/issues/159).
 - Code Improvements
   - Make getDatabaseTreeItems shared between SQLPoolConnections
-  - Reduce code duplication inside specific PoolConnections
+  - Reduce code duplication inside specific PoolConnections and improve return
+    types
 
 ## [0.2.0] 04.02.2024
 

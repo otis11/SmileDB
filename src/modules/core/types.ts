@@ -16,14 +16,23 @@ export interface PoolConnection {
     executeQueriesAndFetch(queries: Query[], queryConfig: QueryConfigFetch): Promise<QueryResult>
 }
 
+export interface SQLDatabaseStats {
+    tables: number,
+    procedures: number,
+    functions: number,
+    views: number
+}
+
 export interface SQLPoolConnection extends PoolConnection {
-    fetchDatabaseStats(): Promise<QueryResult>
-    fetchFunctions(): Promise<QueryResult>
-    fetchProcedures(): Promise<QueryResult>
-    fetchTables(): Promise<QueryResult>
-    fetchViews(): Promise<QueryResult>
-    fetchDatabases(): Promise<QueryResult>
-    fetchSchemas?(): Promise<QueryResult>
+    fetchDatabaseStats(): Promise<SQLDatabaseStats>
+    fetchFunctions(): Promise<string[]>
+    fetchProcedures(): Promise<string[]>
+    fetchFunction(name: string): Promise<string>
+    fetchProcedure(name: string): Promise<string>
+    fetchTables(): Promise<string[]>
+    fetchViews(): Promise<string[]>
+    fetchDatabases(): Promise<string[]>
+    fetchSchemas?(): Promise<string[]>
 }
 
 export interface QueryResultRow {

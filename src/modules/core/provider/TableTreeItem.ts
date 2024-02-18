@@ -23,6 +23,4 @@ export class TableTreeItem extends TreeItem {
             arguments: [this.connectionConfig, this.table]
         }
     }
-
-
 }

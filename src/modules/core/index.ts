@@ -1,8 +1,9 @@
 import * as vscode from 'vscode'
-import { copyToClipboard, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common'
+import { copyToClipboard, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, getPoolConnection, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common'
 import { PoolConnectionTreeProvider, } from './provider'
 import { Module, PoolConnectionConfig } from './types'
 import { renderActiveConnectionsApp } from './webviews/active-connections/app'
+import { renderCodeApp } from './webviews/code/app'
 import { renderEditConnectionApp } from './webviews/edit-connection/app'
 import { renderHelpApp } from './webviews/help/app'
 import { renderTableApp } from './webviews/table/app'
@@ -43,6 +44,32 @@ export const coreModule: Module = {
                 config,
                 table,
             )
+        })
+        registerCommand('SmileDB.openProcedure', async (
+            config: PoolConnectionConfig,
+            name: string,
+        ) => {
+            if (!config || !name) {
+                // todo make available via quickpick?
+                vscode.window.showInformationMessage('To open a procedure click on a procedure inside the tree view. This is not available via the command prompt.')
+                return
+            }
+            // @ts-ignore
+            const result = await getPoolConnection(config).fetchProcedure(name)
+            renderCodeApp({ code: result, title: "Procedure: " + name })
+        })
+        registerCommand('SmileDB.openFunction', async (
+            config: PoolConnectionConfig,
+            name: string,
+        ) => {
+            if (!config || !name) {
+                // todo make available via quickpick?
+                vscode.window.showInformationMessage('To open a function click on a function inside the tree view. This is not available via the command prompt.')
+                return
+            }
+            // @ts-ignore
+            const result = await getPoolConnection(config).fetchFunction(name)
+            renderCodeApp({ code: result, title: "Procedure: " + name })
         })
         registerCommand('SmileDB.deleteConnection', async (treeItem) => {
             if (treeItem) {

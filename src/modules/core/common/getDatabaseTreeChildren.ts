@@ -1,17 +1,17 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
-import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, QueryResultRow, SQLPoolConnection, SchemaTreeItem, TableTreeItem, getPoolConnection, showMessage } from "../"
+import { DatabaseTreeItem, FolderTreeItem, FunctionTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, SQLDatabaseStats, SQLPoolConnection, SchemaTreeItem, TableTreeItem, getPoolConnection, showMessage } from "../"
 
 export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { schemas: false }): Promise<TreeItem[]> {
     if (item instanceof PoolConnectionTreeItem) {
         // root
         const connection = getPoolConnection(item.connectionConfig) as SQLPoolConnection
-        const { rows, fields } = await connection.fetchDatabases()
-        return rows.map(row => new DatabaseTreeItem(
+        const databases = await connection.fetchDatabases()
+        return databases.map(database => new DatabaseTreeItem(
             {
                 ...item.connectionConfig,
                 connection: {
                     ...item.connectionConfig.connection,
-                    database: row[fields[0].name]?.toString() || '',
+                    database,
                 }
             },
 
@@ -21,13 +21,13 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
     else if (item instanceof DatabaseTreeItem && config.schemas) {
         const connection = getPoolConnection(item.connectionConfig) as SQLPoolConnection
         // @ts-ignore exists when config.schemas is set to true
-        const { rows, fields } = await connection.fetchSchemas()
-        return rows.map(row => new SchemaTreeItem(
+        const schemas = await connection.fetchSchemas()
+        return schemas.map(schema => new SchemaTreeItem(
             {
                 ...item.connectionConfig,
                 connection: {
                     ...item.connectionConfig.connection,
-                    schema: row[fields[0].name]?.toString() || '',
+                    schema: schema,
                 }
             },
         ))
@@ -35,13 +35,11 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
 
     else if (item instanceof SchemaTreeItem || item instanceof DatabaseTreeItem && !config.schemas) {
         const connection = getPoolConnection(item.connectionConfig) as SQLPoolConnection
-        let result: QueryResultRow = {}
+        let result: SQLDatabaseStats
         let isLoadingError = false
-        let keys = ['tables', 'procedures', 'functions', 'views']
+        const keys: (keyof SQLDatabaseStats)[] = ['tables', 'procedures', 'functions', 'views']
         try {
-            const r = await connection.fetchDatabaseStats()
-            result = r.rows[0]
-            keys = Object.keys(result)
+            result = await connection.fetchDatabaseStats()
         }
         catch (e: any) {
             showMessage('Error loading database stats', + e?.toString())
@@ -56,7 +54,7 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
                 contextValue: key,
                 description: isLoadingError ? '' : result[key]?.toString(),
                 connectionConfig: item.connectionConfig,
-                state: isLoadingError ? TreeItemCollapsibleState.Collapsed : parseInt(result[key]?.toString() || '0') > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+                state: isLoadingError ? TreeItemCollapsibleState.Collapsed : result[key] > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
             }))
         }
         return folderItems
@@ -75,7 +73,7 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
     }
 
     else if (item instanceof FolderTreeItem && item.contextValue === 'functions') {
-        return await loadAndCreateTreeItem(item, 'fetchFunctions', ProcedureTreeItem)
+        return await loadAndCreateTreeItem(item, 'fetchFunctions', FunctionTreeItem)
     }
 
     return []
@@ -86,9 +84,9 @@ export async function loadAndCreateTreeItem(
     functionName: 'fetchFunctions' | 'fetchProcedures' | 'fetchTables' | 'fetchViews',
     cls: any) {
     const connection = getPoolConnection(item.connectionConfig) as SQLPoolConnection
-    const { rows, fields } = await connection[functionName]()
-    return rows.map(row => new cls({
+    const values = await connection[functionName]()
+    return values.map(value => new cls({
         connectionConfig: item.connectionConfig,
-        label: row[fields[0].name]?.toString() || ''
+        label: value
     }))
 }

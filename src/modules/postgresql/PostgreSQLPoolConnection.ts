@@ -59,66 +59,83 @@ export class PostgreSQLPoolConnection implements SQLPoolConnection {
 
 
     async fetchSchemas() {
-        return this.executeAndMakeResult(`
+        const queryResult = await this.query(`
         SELECT schema_name
         FROM information_schema.schemata
         WHERE catalog_name = '${this.config.connection.database}'`.trim())
+        return queryResult.rows.map(r => r.schema_name) as string[]
+
     }
 
     async fetchDatabases() {
-        return this.executeAndMakeResult('SELECT datname FROM pg_database')
+        const queryResult = await this.query('SELECT datname FROM pg_database')
+        return queryResult.rows.map(r => r.datname) as string[]
     }
 
     async fetchTables() {
-        return this.executeAndMakeResult(`SELECT table_name
+        const queryResult = await this.query(`SELECT table_name
                                             FROM information_schema.tables
                                             WHERE table_schema = '${this.config.connection.schema}'
                                             AND table_catalog = '${this.config.connection.database}'
                                             ORDER BY table_name`)
+        return queryResult.rows.map(r => r.table_name) as string[]
     }
 
     async fetchViews() {
-        return this.executeAndMakeResult(`SELECT table_name
+        const queryResult = await this.query(`SELECT table_name
                                             FROM information_schema.views
                                             WHERE table_schema = '${this.config.connection.schema}'
                                             AND table_catalog = '${this.config.connection.database}'
                                             ORDER BY table_name`)
+        return queryResult.rows.map(r => r.table_name) as string[]
     }
 
     async fetchProcedures() {
-        return this.executeAndMakeResult(`SELECT routine_name
+        const queryResult = await this.query(`SELECT routine_name
                                             FROM information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.schema}'
                                             AND routine_catalog = '${this.config.connection.database}'
                                             AND routine_type = 'PROCEDURE'`)
+        return queryResult.rows.map(r => r.routine_name) as string[]
     }
 
-    private async executeAndMakeResult(query: string) {
-        const timer = new Timer()
-        const queryResult = await this.query(query)
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
+    async fetchProcedure(name: string) {
+        const result = await this.query(`SELECT routine_definition
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.schema}'
+                                            AND routine_catalog = '${this.config.connection.database}'
+                                            AND routine_type = 'PROCEDURE'
+                                            AND routine_name = '${name}'`)
+        return result.rows[0].routine_definition
     }
+
+    async fetchFunction(name: string) {
+        const result = await this.query(`SELECT routine_definition
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.schema}'
+                                            AND routine_catalog = '${this.config.connection.database}'
+                                            AND routine_type = 'FUNCTION'
+                                            AND routine_name = '${name}'`)
+        return result.rows[0].routine_definition
+    }
+
     async fetchFunctions() {
-        return this.executeAndMakeResult(`SELECT routine_name
+        const queryResult = await this.query(`SELECT routine_name
                                             from information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.schema}'
                                             AND routine_catalog = '${this.config.connection.database}'
                                             AND routine_type = 'FUNCTION'`)
+        return queryResult.rows.map(r => r.routine_name) as string[]
     }
 
     async fetchDatabaseStats() {
-        return this.executeAndMakeResult(`SELECT
+        const queryResult = await this.query(`SELECT
                                             (select count(*) from information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as tables,
                                             (select count(*) from information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as views,
                                             (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as procedures,
                                             (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as functions
                                            `)
+        return queryResult.rows[0]
     }
 
     private createQueryResultField(field: FieldDef, fieldConstraintsHashMap: FieldConstraintsHashMap): QueryResultField {

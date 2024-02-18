@@ -36,7 +36,7 @@ export class MySQLPoolConnection implements SQLPoolConnection {
     }
 
     async fetchDatabases() {
-        return this.executeAndMakeResult('SHOW DATABASES')
+        return this.executeAndMakeResultFirstKey('SHOW DATABASES')
     }
 
     private createQueryResultField(mysqlField: FieldPacket): QueryResultField {
@@ -52,51 +52,66 @@ export class MySQLPoolConnection implements SQLPoolConnection {
         return mysqlFields.map(field => this.createQueryResultField(field))
     }
 
+    async fetchProcedure(name: string) {
+        const result = await this.query(`SELECT routine_definition, routine_comment
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.database}'
+                                            AND routine_type = 'PROCEDURE'
+                                            AND routine_name = '${name}'`)
+        // @ts-ignore
+        return '/*' + result[0][0].ROUTINE_COMMENT + '*/\n\n\n' + result[0][0].ROUTINE_DEFINITION as string
+    }
+
+    async fetchFunction(name: string) {
+        const result = await this.query(`SELECT routine_definition, routine_comment
+                                            FROM information_schema.routines
+                                            WHERE routine_schema = '${this.config.connection.database}'
+                                            AND routine_type = 'FUNCTION'
+                                            AND routine_name = '${name}'`)
+        // @ts-ignore
+        return '/*' + result[0][0].ROUTINE_COMMENT + '*/\n\n\n' + result[0][0].ROUTINE_DEFINITION as string
+    }
+
     async fetchTables() {
-        return this.executeAndMakeResult(`SELECT TABLE_NAME
+        return this.executeAndMakeResultFirstKey(`SELECT TABLE_NAME
                                             FROM information_schema.TABLES
                                             WHERE TABLE_SCHEMA = '${this.config.connection.database}'
                                             AND TABLE_TYPE NOT LIKE 'VIEW'`)
     }
 
     async fetchProcedures() {
-        return this.executeAndMakeResult(`SELECT routine_name
+        return this.executeAndMakeResultFirstKey(`SELECT routine_name
                                             FROM information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.database}'
                                             AND routine_type = 'PROCEDURE'`)
-
-    }
-
-    private async executeAndMakeResult(query: string) {
-        const timer = new Timer()
-        const queryResult = await this.query(query)
-        return {
-            fields: [this.createQueryResultField(queryResult[1][0])],
-            rows: queryResult[0] as QueryResultRow[],
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchFunctions() {
-        return this.executeAndMakeResult(`SELECT routine_name
+        return this.executeAndMakeResultFirstKey(`SELECT routine_name
                                             FROM information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.database}'
                                             AND routine_type = 'FUNCTION'`)
     }
 
+    private async executeAndMakeResultFirstKey(query: string): Promise<string[]> {
+        const result = await this.query(query)
+        // @ts-ignore
+        return result[0].map(r => r[result[1][0].name])
+    }
+
     async fetchDatabaseStats() {
-        return this.executeAndMakeResult(`SELECT
+        const result = await this.query(`SELECT
                                             (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE NOT LIKE 'VIEW') as tables,
                                             (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as views,
                                             (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as procedures,
                                             (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as functions
                                            `)
+        // @ts-ignore
+        return result[0][0]
     }
 
     async fetchViews() {
-        return this.executeAndMakeResult(`SELECT TABLE_NAME
+        return this.executeAndMakeResultFirstKey(`SELECT TABLE_NAME
                                             FROM information_schema.TABLES
                                             WHERE TABLE_SCHEMA = '${this.config.connection.database}'
                                             AND TABLE_TYPE LIKE 'VIEW'`)

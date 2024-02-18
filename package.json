@@ -71,7 +71,7 @@
                 },
                 {
                     "command": "SmileDB.copyTreeItemLabel",
-                    "when": "view == SmileDB && viewItem =~ /^(connection|database|schema|table)$/",
+                    "when": "view == SmileDB && viewItem =~ /^(connection|database|schema|table|function|procedure)$/",
                     "group": "util@1"
                 },
                 {
@@ -140,6 +140,16 @@
                 "category": "SmileDB",
                 "icon": "$(table)",
                 "title": "Open Table"
+            },
+            {
+                "command": "SmileDB.openFunction",
+                "category": "SmileDB",
+                "title": "Open Function"
+            },
+            {
+                "command": "SmileDB.openProcedure",
+                "category": "SmileDB",
+                "title": "Open Procedure"
             },
             {
                 "command": "SmileDB.openActiveConnections",
@@ -240,6 +250,7 @@
     },
     "dependencies": {
         "@vscode/webview-ui-toolkit": "^1.2.2",
+        "highlight.js": "^11.9.0",
         "ioredis": "^5.3.2",
         "mongodb": "^5.8.0",
         "mssql": "^10.0.1",

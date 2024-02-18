@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import { QueryResultRow } from "pg"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultFieldFlag, Timer } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, Timer } from "../core"
 
 export class MongoDBPoolConnection implements PoolConnection {
     private client: MongoClient
@@ -34,73 +34,29 @@ export class MongoDBPoolConnection implements PoolConnection {
     }
 
     async fetchDatabases() {
-        const timer = new Timer()
         // only works with admin creds, add option without admin creds
-        const queryResult = await this.client?.db().admin().listDatabases()
-        return {
-            fields: [{
-                name: 'name',
-                type: '',
-                flags: [],
-            }],
-            rows: queryResult.databases,
-            stats: {
-                timeInMilliseconds: timer.stop()
-            }
-        }
+        const result = await this.client?.db().admin().listDatabases()
+        return result.databases.map(r => r.name)
     }
 
-    async fetchTables(): Promise<QueryResult> {
-        const timer = new Timer()
+    async fetchTables() {
         const result = (await this.client?.db(this.config.connection.database).listCollections({
             type: 'collection'
         }).toArray())
-        return {
-            fields: [{
-                name: 'name',
-                type: '',
-                flags: [],
-            }],
-            rows: result,
-            stats: {
-                timeInMilliseconds: timer.stop()
-            }
-        }
+        return result.map(r => r.name)
     }
 
-    async fetchDatabaseStats(): Promise<QueryResult> {
-        const timer = new Timer()
+    async fetchDatabaseStats() {
         const result = await this.client?.db(this.config.connection.database).stats()
-        return {
-            fields: [{
-                name: 'name',
-                type: '',
-                flags: [],
-            }],
-            rows: [result],
-            stats: {
-                timeInMilliseconds: timer.stop()
-            }
-        }
+        return result
     }
 
 
-    async fetchViews(): Promise<QueryResult> {
-        const timer = new Timer()
+    async fetchViews() {
         const result = (await this.client?.db(this.config.connection.database).listCollections({
             type: 'view'
         }).toArray())
-        return {
-            fields: [{
-                name: 'name',
-                type: '',
-                flags: [],
-            }],
-            rows: result,
-            stats: {
-                timeInMilliseconds: timer.stop()
-            }
-        }
+        return result.map(r => r.name)
     }
 
     buildQueriesFetch(queryConfig: QueryConfigFetch) {

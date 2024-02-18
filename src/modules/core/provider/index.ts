@@ -1,5 +1,6 @@
 export * from './DatabaseTreeItem'
 export * from './FolderTreeItem'
+export * from './FunctionTreeItem'
 export * from './GlobalTreeItem'
 export * from './PoolConnectionTreeItem'
 export * from './PoolConnectionTreeProvider'
