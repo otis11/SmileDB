@@ -73,6 +73,11 @@
                     "command": "SmileDB.copyTreeItemLabel",
                     "when": "view == SmileDB && viewItem =~ /^(connection|database|schema|table)$/",
                     "group": "util@1"
+                },
+                {
+                    "command": "SmileDB.copyTreeItemDescription",
+                    "when": "view == SmileDB && viewItem =~ /^(tables|procedures|views|functions|connection)$/",
+                    "group": "util@2"
                 }
             ]
         },
@@ -152,6 +157,11 @@
                 "command": "SmileDB.copyTreeItemLabel",
                 "category": "SmileDB",
                 "title": "Copy Label"
+            },
+            {
+                "command": "SmileDB.copyTreeItemDescription",
+                "category": "SmileDB",
+                "title": "Copy Description"
             }
         ],
         "configuration": {

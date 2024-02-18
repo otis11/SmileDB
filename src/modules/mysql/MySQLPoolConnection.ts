@@ -1,8 +1,8 @@
 import { FieldPacket, Pool, createPool } from "mysql2/promise"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, QueryResultRow, Timer } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLPoolConnection, Timer } from "../core"
 import { mysqlTypeMap } from "./types"
 
-export class MySQLPoolConnection implements PoolConnection {
+export class MySQLPoolConnection implements SQLPoolConnection {
     private pool: Pool
 
     constructor(public config: PoolConnectionConfig) {
@@ -36,15 +36,7 @@ export class MySQLPoolConnection implements PoolConnection {
     }
 
     async fetchDatabases() {
-        const timer = new Timer()
-        const queryResult = await this.query('SHOW DATABASES')
-        return {
-            rows: queryResult[0] as QueryResultRow[],
-            fields: [this.createQueryResultField(queryResult[1][0])],
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
+        return this.executeAndMakeResult('SHOW DATABASES')
     }
 
     private createQueryResultField(mysqlField: FieldPacket): QueryResultField {
@@ -61,26 +53,23 @@ export class MySQLPoolConnection implements PoolConnection {
     }
 
     async fetchTables() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT TABLE_NAME
+        return this.executeAndMakeResult(`SELECT TABLE_NAME
                                             FROM information_schema.TABLES
                                             WHERE TABLE_SCHEMA = '${this.config.connection.database}'
                                             AND TABLE_TYPE NOT LIKE 'VIEW'`)
-        return {
-            fields: [this.createQueryResultField(queryResult[1][0])],
-            rows: queryResult[0] as QueryResultRow[],
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchProcedures() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT routine_name
+        return this.executeAndMakeResult(`SELECT routine_name
                                             FROM information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.database}'
                                             AND routine_type = 'PROCEDURE'`)
+
+    }
+
+    private async executeAndMakeResult(query: string) {
+        const timer = new Timer()
+        const queryResult = await this.query(query)
         return {
             fields: [this.createQueryResultField(queryResult[1][0])],
             rows: queryResult[0] as QueryResultRow[],
@@ -91,50 +80,26 @@ export class MySQLPoolConnection implements PoolConnection {
     }
 
     async fetchFunctions() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT routine_name
+        return this.executeAndMakeResult(`SELECT routine_name
                                             FROM information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.database}'
                                             AND routine_type = 'FUNCTION'`)
-        return {
-            fields: [this.createQueryResultField(queryResult[1][0])],
-            rows: queryResult[0] as QueryResultRow[],
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchDatabaseStats() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT
-                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE NOT LIKE 'VIEW') as TotalTables,
-                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as TotalViews,
-                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as TotalProcedures,
-                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as TotalFunctions
+        return this.executeAndMakeResult(`SELECT
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE NOT LIKE 'VIEW') as tables,
+                                            (select count(*) from information_schema.TABLES WHERE TABLE_SCHEMA = '${this.config.connection.database}' AND TABLE_TYPE LIKE 'VIEW') as views,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as procedures,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as functions
                                            `)
-        return {
-            fields: [this.createQueryResultField(queryResult[1][0])],
-            rows: queryResult[0] as QueryResultRow[],
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchViews() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT TABLE_NAME
+        return this.executeAndMakeResult(`SELECT TABLE_NAME
                                             FROM information_schema.TABLES
                                             WHERE TABLE_SCHEMA = '${this.config.connection.database}'
                                             AND TABLE_TYPE LIKE 'VIEW'`)
-        return {
-            fields: [this.createQueryResultField(queryResult[1][0])],
-            rows: queryResult[0] as QueryResultRow[],
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     private createOrderBy(configOrderBy?: OrderByConfig) {

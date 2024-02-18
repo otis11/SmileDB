@@ -1,5 +1,5 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
-import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, TableTreeItem, getPoolConnection } from "../core"
+import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, TableTreeItem, getPoolConnection, loadAndCreateTreeItem } from "../core"
 import { MongoDBPoolConnection } from "./MongoDBPoolConnection"
 
 export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[]> {
@@ -42,21 +42,11 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
     }
 
     else if (item instanceof FolderTreeItem && item.contextValue === 'collectionFolder') {
-        const connection = getPoolConnection(item.connectionConfig) as MongoDBPoolConnection
-        const { rows, fields } = await connection.fetchTables()
-        return rows.map(row => new TableTreeItem(
-            item.connectionConfig,
-            row[fields[0].name]?.toString() || ''
-        ))
+        return await loadAndCreateTreeItem(item, 'fetchTables', TableTreeItem)
     }
 
     else if (item instanceof FolderTreeItem && item.contextValue === 'viewFolder') {
-        const connection = getPoolConnection(item.connectionConfig) as MongoDBPoolConnection
-        const { rows, fields } = await connection.fetchViews()
-        return rows.map(row => new TableTreeItem(
-            item.connectionConfig,
-            row[fields[0].name]?.toString() || ''
-        ))
+        return await loadAndCreateTreeItem(item, 'fetchViews', TableTreeItem)
     }
 
     return []

@@ -1,7 +1,7 @@
+import { TreeItem } from "vscode"
 import { getConfig } from "../../config"
-import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
+import { ConnectionClientModule, PoolConnection, PoolConnectionConfig, getDatabaseTreeChildrenSQL } from "../core"
 import { MySQLPoolConnection } from "./MySQLPoolConnection"
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mysqlModule: ConnectionClientModule = {
     name: 'MySQL',
@@ -10,7 +10,9 @@ export const mysqlModule: ConnectionClientModule = {
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
         return new MySQLPoolConnection(config)
     },
-    getDatabaseTreeChildren,
+    getDatabaseTreeChildren: (item: TreeItem) => {
+        return getDatabaseTreeChildrenSQL(item)
+    },
     getDefaultPoolConnectionConfig() {
         const config = getConfig()
         return {

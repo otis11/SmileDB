@@ -1,7 +1,7 @@
+import { TreeItem } from "vscode"
 import { getConfig } from "../../config"
-import { ConnectionClientModule, PoolConnectionConfig } from "../core"
+import { ConnectionClientModule, PoolConnectionConfig, getDatabaseTreeChildrenSQL } from "../core"
 import { PostgreSQLPoolConnection } from "./PostgreSQLPoolConnection"
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const postgresModule: ConnectionClientModule = {
     name: 'PostgreSQL',
@@ -10,7 +10,9 @@ export const postgresModule: ConnectionClientModule = {
     createPoolConnection(config: PoolConnectionConfig) {
         return new PostgreSQLPoolConnection(config)
     },
-    getDatabaseTreeChildren,
+    getDatabaseTreeChildren: (item: TreeItem) => {
+        return getDatabaseTreeChildrenSQL(item, { schemas: true })
+    },
     getDefaultPoolConnectionConfig() {
         const config = getConfig()
         return {

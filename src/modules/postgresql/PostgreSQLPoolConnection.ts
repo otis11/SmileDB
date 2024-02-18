@@ -1,5 +1,5 @@
 import { FieldDef, Pool } from "pg"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, Timer } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, SQLPoolConnection, Timer } from "../core"
 import { postgresqlTypeMap } from "./types"
 
 export type FieldConstraintsHashMap = Record<string, {
@@ -9,7 +9,7 @@ export type FieldConstraintsHashMap = Record<string, {
     is_unique: 'YES' | 'NO'
 }>
 
-export class PostgreSQLPoolConnection implements PoolConnection {
+export class PostgreSQLPoolConnection implements SQLPoolConnection {
     private pool: Pool
 
     constructor(public config: PoolConnectionConfig) {
@@ -59,72 +59,43 @@ export class PostgreSQLPoolConnection implements PoolConnection {
 
 
     async fetchSchemas() {
-        const timer = new Timer()
-        const query = `
+        return this.executeAndMakeResult(`
         SELECT schema_name
         FROM information_schema.schemata
-        WHERE catalog_name = '${this.config.connection.database}'`.trim()
-        const queryResult = await this.pool.query(query)
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
+        WHERE catalog_name = '${this.config.connection.database}'`.trim())
     }
 
     async fetchDatabases() {
-        const timer = new Timer()
-        const queryResult = await this.query('SELECT datname FROM pg_database')
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
+        return this.executeAndMakeResult('SELECT datname FROM pg_database')
     }
 
     async fetchTables() {
-        const timer = new Timer()
-        const queryResult = await this.pool.query(`SELECT table_name
+        return this.executeAndMakeResult(`SELECT table_name
                                             FROM information_schema.tables
                                             WHERE table_schema = '${this.config.connection.schema}'
                                             AND table_catalog = '${this.config.connection.database}'
                                             ORDER BY table_name`)
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchViews() {
-        const timer = new Timer()
-        const queryResult = await this.pool.query(`SELECT table_name
+        return this.executeAndMakeResult(`SELECT table_name
                                             FROM information_schema.views
                                             WHERE table_schema = '${this.config.connection.schema}'
                                             AND table_catalog = '${this.config.connection.database}'
                                             ORDER BY table_name`)
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchProcedures() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT routine_name
+        return this.executeAndMakeResult(`SELECT routine_name
                                             FROM information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.schema}'
                                             AND routine_catalog = '${this.config.connection.database}'
                                             AND routine_type = 'PROCEDURE'`)
+    }
+
+    private async executeAndMakeResult(query: string) {
+        const timer = new Timer()
+        const queryResult = await this.query(query)
         return {
             fields: this.createQueryResultFields(queryResult.fields, {}),
             rows: queryResult.rows,
@@ -133,38 +104,21 @@ export class PostgreSQLPoolConnection implements PoolConnection {
             },
         }
     }
-
     async fetchFunctions() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT routine_name
+        return this.executeAndMakeResult(`SELECT routine_name
                                             from information_schema.routines
                                             WHERE routine_schema = '${this.config.connection.schema}'
                                             AND routine_catalog = '${this.config.connection.database}'
                                             AND routine_type = 'FUNCTION'`)
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     async fetchDatabaseStats() {
-        const timer = new Timer()
-        const queryResult = await this.query(`SELECT
-                                            (select count(*) from information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totaltables,
-                                            (select count(*) from information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as totalviews,
-                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as totalprocedures,
-                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as totalfunctions
+        return this.executeAndMakeResult(`SELECT
+                                            (select count(*) from information_schema.tables WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as tables,
+                                            (select count(*) from information_schema.views WHERE TABLE_SCHEMA = '${this.config.connection.schema}' AND table_catalog = '${this.config.connection.database}') as views,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'PROCEDURE') as procedures,
+                                            (select count(*) from information_schema.routines WHERE routine_schema = '${this.config.connection.schema}' AND routine_catalog = '${this.config.connection.database}' AND routine_type = 'FUNCTION') as functions
                                            `)
-        return {
-            fields: this.createQueryResultFields(queryResult.fields, {}),
-            rows: queryResult.rows,
-            stats: {
-                timeInMilliseconds: timer.stop(),
-            },
-        }
     }
 
     private createQueryResultField(field: FieldDef, fieldConstraintsHashMap: FieldConstraintsHashMap): QueryResultField {

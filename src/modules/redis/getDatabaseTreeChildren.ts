@@ -9,13 +9,17 @@ export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[
         const { rows, fields } = await connection.fetchDatabases()
         return rows.map(row => new TableTreeItem(
             {
-                ...item.connectionConfig,
-                connection: {
-                    ...item.connectionConfig.connection,
-                    database: row[fields[0].name]?.toString() || '',
-                }
-            },
-            row[fields[0].name]?.toString() || ''
+                connectionConfig: {
+                    ...item.connectionConfig,
+                    connection: {
+                        ...item.connectionConfig.connection,
+                        database: row[fields[0].name]?.toString() || '',
+                    }
+                },
+                label: row[fields[0].name]?.toString() || ''
+            }
+
+
         ))
     }
 

@@ -1,5 +1,4 @@
 import { TreeItem } from "vscode"
-import { PoolConnectionTreeItem } from "./provider"
 
 export interface PoolConnection {
     config: PoolConnectionConfig
@@ -15,6 +14,16 @@ export interface PoolConnection {
     // execute queries
     executeQuery(query: Query): Promise<QueryResult>
     executeQueriesAndFetch(queries: Query[], queryConfig: QueryConfigFetch): Promise<QueryResult>
+}
+
+export interface SQLPoolConnection extends PoolConnection {
+    fetchDatabaseStats(): Promise<QueryResult>
+    fetchFunctions(): Promise<QueryResult>
+    fetchProcedures(): Promise<QueryResult>
+    fetchTables(): Promise<QueryResult>
+    fetchViews(): Promise<QueryResult>
+    fetchDatabases(): Promise<QueryResult>
+    fetchSchemas?(): Promise<QueryResult>
 }
 
 export interface QueryResultRow {
@@ -94,7 +103,7 @@ export type Module = {
 export type ConnectionClientModule = Module & {
     getDefaultPoolConnectionConfig: () => DefaultPoolConnectionConfig
     createPoolConnection(config: PoolConnectionConfig): PoolConnection
-    getDatabaseTreeChildren(item: PoolConnectionTreeItem): Promise<TreeItem[]>
+    getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[]>
     icon: string,
     iconActive: string,
 }

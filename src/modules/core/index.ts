@@ -94,6 +94,13 @@ export const coreModule: Module = {
                 vscode.window.showInformationMessage('Only available by right clicking on a tree item.')
             }
         })
+        registerCommand('SmileDB.copyTreeItemDescription', (treeItem) => {
+            if (treeItem instanceof vscode.TreeItem) {
+                copyToClipboard(treeItem.description?.toString() || '')
+            } else {
+                vscode.window.showInformationMessage('Only available by right clicking on a tree item.')
+            }
+        })
     }
 }
 

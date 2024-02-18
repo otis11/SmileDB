@@ -1,7 +1,7 @@
+import { TreeItem } from "vscode"
 import { getConfig } from "../../config"
-import { ConnectionClientModule, PoolConnection, PoolConnectionConfig } from "../core"
+import { ConnectionClientModule, PoolConnection, PoolConnectionConfig, getDatabaseTreeChildrenSQL } from "../core"
 import { MSSQLPoolConnection } from "./MSSQLPoolConnection"
-import { getDatabaseTreeChildren } from "./getDatabaseTreeChildren"
 
 export const mssqlModule: ConnectionClientModule = {
     name: 'MSSQL',
@@ -10,7 +10,9 @@ export const mssqlModule: ConnectionClientModule = {
     createPoolConnection(config: PoolConnectionConfig): PoolConnection {
         return new MSSQLPoolConnection(config)
     },
-    getDatabaseTreeChildren,
+    getDatabaseTreeChildren: (item: TreeItem) => {
+        return getDatabaseTreeChildrenSQL(item, { schemas: true })
+    },
     getDefaultPoolConnectionConfig() {
         const config = getConfig()
         return {
