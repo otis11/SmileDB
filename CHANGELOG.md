@@ -12,6 +12,8 @@
     mysql.proc, are corrupted
     (https://github.com/antares-sql/antares/issues/159).
   - add option to expand tables instant (`tree.expandTablesInstant`)
+- Table
+  - Close Popup when the `esc` key is pressed
 - Code Improvements
   - Make getDatabaseTreeItems shared between SQLPoolConnections
   - Reduce code duplication inside specific PoolConnections and improve return

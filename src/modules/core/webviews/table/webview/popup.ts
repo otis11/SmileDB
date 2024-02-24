@@ -8,10 +8,18 @@ export function openPopup(content: string) {
         popupElementContent.innerHTML = content
         popupElement?.classList.remove('d-none')
         document.body.style.overflow = 'hidden'
+        document.addEventListener('keydown', onDocumentKeydown)
     }
 }
 
 export function closePopup() {
     popupElement?.classList.add('d-none')
     document.body.style.overflow = 'unset'
+    document.removeEventListener('keydown', onDocumentKeydown)
+}
+
+function onDocumentKeydown(e) {
+    if (e.key === 'Escape') {
+        closePopup()
+    }
 }
