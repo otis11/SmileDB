@@ -5,6 +5,9 @@ import { LogLevel } from './modules/core'
 export function getConfig() {
     const vsconfig = workspace.getConfiguration('SmileDB')
     return {
+        tree: {
+            expandTablesInstant: vsconfig.get('tree.expandTablesInstant') as boolean
+        },
         general: {
             logLevel: LogLevel.debug,
             messageDisplay: vsconfig.get('general.messageDisplay') as 'Information Message' | 'Status Bar',

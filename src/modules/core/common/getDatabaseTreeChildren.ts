@@ -1,5 +1,6 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
 import { DatabaseTreeItem, FolderTreeItem, FunctionTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, SQLDatabaseStats, SQLPoolConnection, SchemaTreeItem, TableTreeItem, getPoolConnection, showMessage } from "../"
+import { getConfig } from "../../../config"
 
 export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { schemas: false }): Promise<TreeItem[]> {
     if (item instanceof PoolConnectionTreeItem) {
@@ -35,7 +36,7 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
 
     else if (item instanceof SchemaTreeItem || item instanceof DatabaseTreeItem && !config.schemas) {
         const connection = getPoolConnection(item.connectionConfig) as SQLPoolConnection
-        let result: SQLDatabaseStats
+        let result: SQLDatabaseStats = { tables: 0, procedures: 0, functions: 0, views: 0 }
         let isLoadingError = false
         const keys: (keyof SQLDatabaseStats)[] = ['tables', 'procedures', 'functions', 'views']
         try {
@@ -49,13 +50,22 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
         const folderItems = []
         for (let i = 0; i < keys.length; i++) {
             const key = keys[i]
-            folderItems.push(new FolderTreeItem({
+            let state = isLoadingError ? TreeItemCollapsibleState.Collapsed : result[key] > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+
+            if (key === 'tables') {
+                if (getConfig().tree.expandTablesInstant && result[key] > 0) {
+                    state = TreeItemCollapsibleState.Expanded
+                }
+            }
+
+            const folderItem = new FolderTreeItem({
                 label: key,
                 contextValue: key,
                 description: isLoadingError ? '' : result[key]?.toString(),
                 connectionConfig: item.connectionConfig,
-                state: isLoadingError ? TreeItemCollapsibleState.Collapsed : result[key] > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
-            }))
+                state,
+            })
+            folderItems.push(folderItem)
         }
         return folderItems
     }

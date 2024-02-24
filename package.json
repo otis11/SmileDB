@@ -186,6 +186,11 @@
                     ],
                     "description": "How some feedback messages of this extension should be displayed. (for example successful table updates)"
                 },
+                "SmileDB.tree.expandTablesInstant": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If inside the connections tree view the tables folder should be expanded instant."
+                },
                 "SmileDB.table.pageResultsLimit": {
                     "default": 100,
                     "type": "integer",

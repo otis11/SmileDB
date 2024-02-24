@@ -11,6 +11,7 @@
     hinder the user to load a specific folder if some tables, for example
     mysql.proc, are corrupted
     (https://github.com/antares-sql/antares/issues/159).
+  - add option to expand tables instant (`tree.expandTablesInstant`)
 - Code Improvements
   - Make getDatabaseTreeItems shared between SQLPoolConnections
   - Reduce code duplication inside specific PoolConnections and improve return
