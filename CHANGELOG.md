@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.2.1] unreleased
+## [0.2.1] 24.02.2024
 
 - Add inspect code view for procedures and functions
 - Database Tree
