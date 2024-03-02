@@ -142,7 +142,7 @@ export class MongoDBPoolConnection implements PoolConnection {
                 // document id
                 field[key] = field[key].toString()
             }
-            else if (typeof field[key] === "object") {
+            else if (typeof field[key] === "object" && field[key] !== null) {
                 field[key] = JSON.stringify(field[key])
             }
         })

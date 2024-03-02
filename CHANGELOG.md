@@ -1,6 +1,9 @@
 # Change Log
 
-## [0.2.1] 02.03.2024
+## [0.2.3] 02.03.2024
+- Fixed a bug which caused `MongoDB` to convert a `null` value into the string `"null"`
+
+## [0.2.2] 02.03.2024
 - Fixed a bug which caused the table view to convert an empty string into `null` which resulted in a wrong type check when updating or deleting the value
 - Fixed a bug which caused wrong `NULL` where conditions in `MySQL`, `PostgreSQL`, `MariaDB` and `MSSQL` (e.g could not update data where `NULL` was involved)
 - Fixed a bug which caused on table selection to select the wrong columns when the filter method has been changed
