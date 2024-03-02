@@ -108,7 +108,8 @@ function createUpdatesForQueryChanges() {
         const update = queryResultChanges[rowNumber]
         const where: QueryResultRow = {}
         for (let i = 0; i < fields.length; i++) {
-            where[fields[i].name] = queryResult?.rows[rowNumber][fields[i].name] || null
+            const value = queryResult?.rows[rowNumber][fields[i].name]
+            where[fields[i].name] = value === undefined ? '' : value
         }
 
         queryUpdates.push({
@@ -143,7 +144,8 @@ function createDeletesForQueryChanges(rows: number[]) {
     for (const row of rows) {
         const where: QueryResultRow = {}
         for (let i = 0; i < fields.length; i++) {
-            where[fields[i].name] = queryResult?.rows[row][fields[i].name] || null
+            const value = queryResult?.rows[row][fields[i].name]
+            where[fields[i].name] = value === undefined ? '' : value
         }
 
         queryUpdates.push({

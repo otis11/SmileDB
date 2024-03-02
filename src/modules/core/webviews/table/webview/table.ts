@@ -43,7 +43,7 @@ export async function renderTableResult() {
     tableElementString += '<div id="table-selection-mode-overlay" class="d-none"></div>'
     tableElement.innerHTML = tableElementString
     requestAnimationFrame(() => {
-        logDebug("Table render took: " + (performance.now() - startRenderTable).toFixed(2) + ' ms')
+        logDebug("Table render took: " + (performance.now() - startRenderTable).toFixed(2) + ' ms', queryResult)
         const tableOverlay = document.getElementById('table-selection-mode-overlay')
         addSelectionModeOverlayEventListeners(tableOverlay)
         renderOrderBy()
