@@ -34,8 +34,12 @@ export function addSelectionModeOverlayEventListeners(overlayElement: HTMLElemen
         overlayElement.addEventListener('mousemove', onSelectionModeMouseMove)
         overlayElement.addEventListener('contextmenu', onSelectionModeContextMenu)
         overlayElement.addEventListener('dblclick', onSelectionModeDoubleClick)
-        selectionModeTableOffsetTop = getTableElement()?.offsetTop || 0
+        updateSelectionModeOffset()
     }
+}
+
+export function updateSelectionModeOffset() {
+    selectionModeTableOffsetTop = getTableElement()?.offsetTop || 0
 }
 
 export function getIsSelectionModeActive() {

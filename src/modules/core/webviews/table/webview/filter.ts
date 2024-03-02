@@ -2,6 +2,7 @@ import { AllowedFilterMethod, PoolConnectionConfig } from "../../../types"
 import { getQueryResult, requestExecuteQuery, requestExecuteQueryFetch } from "./query"
 import { renderSelectWithId } from "./select"
 import { getTableElement } from "./table"
+import { updateSelectionModeOffset } from "./tableSelectionMode"
 
 const headerFilterClientInputElement = document.getElementById('header-filter-client-input') as HTMLInputElement
 const headerFilterClientElement = document.getElementById('header-filter-client') as HTMLInputElement
@@ -51,6 +52,7 @@ export function renderFilterInput() {
             const headerHeight = Math.max(59, headerFilterQueryInputElement.offsetHeight + 30)
             body.style.paddingTop = `${headerHeight}px`
         }
+        updateSelectionModeOffset()
     }).observe(headerFilterQueryInputElement)
 
     headerFilterQueryRunElement.addEventListener('click', (e) => {
@@ -78,12 +80,18 @@ function renderActiveFilter() {
         filterInputDatabaseString = headerFilterDatabaseInputElement?.value || ''
         filterInputClientString = ''
     } else {
+        // query
         headerFilterClientElement?.classList.add('d-none')
         headerFilterDatabaseElement?.classList.add('d-none')
         headerFilterQueryElement?.classList.remove('d-none')
         filterInputDatabaseString = headerFilterDatabaseInputElement?.value || ''
         filterInputClientString = ''
     }
+
+    // update table selection mode offset
+    requestAnimationFrame(() => {
+        updateSelectionModeOffset()
+    })
 }
 
 export async function setActiveFilterAndFocus(method: AllowedFilterMethod) {
