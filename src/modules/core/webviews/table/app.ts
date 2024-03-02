@@ -226,6 +226,7 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
                 <div id="header-filter-query">
                     <textarea id="header-filter-query-input" class="header-filter-input" value="${connectionConfig.advanced.filter.queryPrefilled || ''}"></textarea>
                     <i id="header-filter-query-run" class="codicon codicon-play success"></i>
+                    <i id="header-filter-query-save" class="codicon codicon-save"></i>
                 </div>
             </div>
             <div class="header-row d-none" id="error-message-container">

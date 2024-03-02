@@ -1,5 +1,5 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
-import { DatabaseTreeItem, FolderTreeItem, FunctionTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, SQLDatabaseStats, SQLPoolConnection, SchemaTreeItem, TableTreeItem, getPoolConnection, showMessage } from "../"
+import { DatabaseTreeItem, FolderTreeItem, FunctionTreeItem, PoolConnectionTreeItem, ProcedureTreeItem, QueriesTreeItem, SQLDatabaseStats, SQLPoolConnection, SchemaTreeItem, TableTreeItem, getPoolConnection, showMessage } from "../"
 import { getConfig } from "../../../config"
 
 export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { schemas: false }): Promise<TreeItem[]> {
@@ -47,7 +47,9 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
             isLoadingError = true
         }
 
-        const folderItems = []
+        const folderItems: TreeItem[] = [
+            new QueriesTreeItem({ connectionConfig: item.connectionConfig }),
+        ]
         for (let i = 0; i < keys.length; i++) {
             const key = keys[i]
             let state = isLoadingError ? TreeItemCollapsibleState.Collapsed : result[key] > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None

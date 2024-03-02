@@ -402,6 +402,12 @@ vscode-text-field {
     right: 12px;
 }
 
+#header-filter-query-save {
+    position: absolute;
+    bottom: 36px;
+    right: 12px;
+}
+
 #header-filter-query #header-filter-query-run.success {
     color: var(--color-success);
 }

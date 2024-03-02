@@ -10,6 +10,7 @@ const headerFilterDatabaseElement = document.getElementById('header-filter-datab
 const headerFilterQueryInputElement = document.getElementById('header-filter-query-input') as HTMLInputElement
 const headerFilterQueryElement = document.getElementById('header-filter-query') as HTMLInputElement
 const headerFilterQueryRunElement = document.getElementById('header-filter-query-run') as HTMLInputElement
+const headerFilterQuerySaveElement = document.getElementById('header-filter-query-save') as HTMLInputElement
 
 
 let activeFilterInput: AllowedFilterMethod | null = null
@@ -56,6 +57,11 @@ export function renderFilterInput() {
     headerFilterQueryRunElement.addEventListener('click', (e) => {
         const query = headerFilterQueryInputElement.value
         requestExecuteQuery(query)
+    })
+
+    headerFilterQuerySaveElement.addEventListener('click', (e) => {
+        const query = headerFilterQueryInputElement.value
+        requestSaveQuery(query)
     })
 }
 
