@@ -248,10 +248,10 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
     <div id="table-selection-context-menu" class="select-options">
         <div class="select-option" id="table-selection-context-menu-set-null">Set NULL</div>
         <div class="select-option" id="table-selection-context-menu-delete-row">Delete Row</div>
-        <div class="select-option" id="table-selection-context-menu-delete-row-clear">Clear: Delete Row</div>
+        <div class="select-option" id="table-selection-context-menu-delete-rows">Delete Selected Rows</div>
         <div class="horizontal-divider"></div>
-        <div class="select-option" id="table-selection-context-menu-delete-rows">Selected Delete Rows</div>
-        <div class="select-option" id="table-selection-context-menu-delete-rows-clear">Clear: Selected Delete Rows</div>
+        <div class="select-option" id="table-selection-context-menu-delete-row-clear">Clear Delete Row</div>
+        <div class="select-option" id="table-selection-context-menu-delete-rows-clear">Clear Delete Selected Rows</div>
         <div class="horizontal-divider"></div>
         <div class="select-option" id="table-selection-context-menu-select-row">Select Row</div>
         <div class="select-option" id="table-selection-context-menu-select-column">Select Column</div>

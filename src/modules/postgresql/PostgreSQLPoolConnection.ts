@@ -1,5 +1,5 @@
 import { FieldDef, Pool } from "pg"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, SQLPoolConnection, Timer } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, SQLPoolConnection, Timer, buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from "../core"
 import { postgresqlTypeMap } from "./types"
 
 export type FieldConstraintsHashMap = Record<string, {
@@ -179,7 +179,7 @@ export class PostgreSQLPoolConnection implements SQLPoolConnection {
         const orderBy = this.createOrderBy(config.orderBy)
         const where = config.filterString ? 'WHERE ' + config.filterString : ''
         const query = `SELECT *
-FROM "${config.database}"."${config.schema}"."${config.table}"
+FROM ${this.dbId(config)}
 ${where}
 ${orderBy}
 ${limit}`
@@ -187,54 +187,34 @@ ${limit}`
     }
 
     buildQueriesInsert(insertions: DatabaseObjectInsert, queryConfig: QueryConfigInsert) {
-        const queries: string[] = []
-        for (let i = 0; i < insertions.insertions.length; i++) {
-            const insertion = insertions.insertions[i]
-            const queryStart = `INSERT INTO "${queryConfig.database}"."${queryConfig.schema}"."${queryConfig.table}"`
-            const queryFields = ` (${Object.keys(insertion).join(', ')})`
-            const queryValues = ` VALUES (${Object.keys(insertion).map(fieldName => this.convertJavascriptValueToPSQL(insertion[fieldName]))})`
-            queries.push(queryStart + queryFields + queryValues)
-        }
-        return queries
+        return buildSQLQueryInsertions(
+            insertions,
+            {
+                dbId: this.dbId(queryConfig)
+            }
+        )
     }
 
     buildQueriesDelete(deletions: DatabaseObjectDelete[], queryConfig: QueryConfigDelete) {
-        const queries = []
-        for (let i = 0; i < deletions.length; i++) {
-            const whereStatements = "WHERE " + Object.keys(deletions[i].where).map(field =>
-                `${field} = ${this.convertJavascriptValueToPSQL(deletions[i].where[field])}`
-            ).join(' AND ')
-            queries.push(`DELETE FROM "${queryConfig.database}"."${queryConfig.schema}"."${queryConfig.table}"
-${whereStatements}`)
-        }
-        return queries
+        return buildSQLQueryDeletions(
+            deletions,
+            {
+                dbId: this.dbId(queryConfig)
+            }
+        )
     }
 
-    buildQueriesUpdate(changes: DatabaseObjectUpdate[], config: QueryConfigUpdate) {
-        const queries = []
-        for (let i = 0; i < changes.length; i++) {
-            const whereStatements = "WHERE " + Object.keys(changes[i].where).map(field =>
-                `${field} = ${this.convertJavascriptValueToPSQL(changes[i].where[field])}`
-            ).join(' AND ')
-            const setStatements = "SET " + Object.keys(changes[i].update).map(field =>
-                `${field} = ${this.convertJavascriptValueToPSQL(changes[i].update[field])}`
-            ).join(',')
-            queries.push(`UPDATE "${config.database}"."${config.schema}"."${config.table}"
-${setStatements}
-${whereStatements}`)
-        }
-        return queries
+    buildQueriesUpdate(changes: DatabaseObjectUpdate[], queryConfig: QueryConfigUpdate) {
+        return buildSQLQueryUpdates(
+            changes,
+            {
+                dbId: this.dbId(queryConfig)
+            }
+        )
     }
 
-
-    convertJavascriptValueToPSQL(val: string | number | null | undefined) {
-        if (val === null) {
-            return 'NULL'
-        }
-        if (typeof val === 'number') {
-            return val
-        }
-        return `'${val}'`
+    private dbId(queryConfig: QueryConfigBase) {
+        return `"${queryConfig.database}"."${queryConfig.schema}"."${queryConfig.table}"`
     }
 
     private async fetchFieldConstraints(config: QueryConfigFetch, pool: Pool) {

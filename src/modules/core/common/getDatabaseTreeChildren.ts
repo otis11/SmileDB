@@ -53,7 +53,7 @@ export async function getDatabaseTreeChildrenSQL(item: TreeItem, config = { sche
             let state = isLoadingError ? TreeItemCollapsibleState.Collapsed : result[key] > 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
 
             if (key === 'tables') {
-                if (getConfig().tree.expandTablesInstant && result[key] > 0) {
+                if (getConfig().tree.expandTablesInstantly && result[key] > 0) {
                     state = TreeItemCollapsibleState.Expanded
                 }
             }

@@ -1,12 +1,11 @@
 import { workspace } from 'vscode'
 import { LogLevel } from './modules/core'
 
-
 export function getConfig() {
     const vsconfig = workspace.getConfiguration('SmileDB')
     return {
         tree: {
-            expandTablesInstant: vsconfig.get('tree.expandTablesInstant') as boolean
+            expandTablesInstantly: vsconfig.get('tree.expandTablesInstantly') as boolean
         },
         general: {
             logLevel: LogLevel.debug,

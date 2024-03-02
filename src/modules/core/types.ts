@@ -179,3 +179,8 @@ export type PoolConnectionConnectionMethod =
 export interface DefaultPoolConnectionConfig extends PoolConnectionConfig {
     id: -1
 }
+
+export type SQLQueryBuildConfig = {
+    dbId: string,
+    stringWrap?: string
+}

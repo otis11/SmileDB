@@ -1,5 +1,5 @@
 import { ConnectionPool } from 'mssql'
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLDatabaseStats, SQLPoolConnection, Timer } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLDatabaseStats, SQLPoolConnection, Timer, buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from "../core"
 
 export type MSSQLColumn = {
     name: string,
@@ -172,7 +172,7 @@ export class MSSQLPoolConnection implements SQLPoolConnection {
         const orderBy = this.createOrderBy(config.orderBy)
         const where = config.filterString ? 'WHERE ' + config.filterString : ''
 
-        const query = `SELECT * FROM [${config.database}].[${config.schema}].[${config.table}]
+        const query = `SELECT * FROM ${this.dbId(config)}
 ${where}
 ${orderBy}
 OFFSET ${config.page * config.pageResultsLimit} ROWS FETCH NEXT ${config.pageResultsLimit} ROWS ONLY`
@@ -180,43 +180,34 @@ OFFSET ${config.page * config.pageResultsLimit} ROWS FETCH NEXT ${config.pageRes
     }
 
     buildQueriesInsert(insertions: DatabaseObjectInsert, queryConfig: QueryConfigInsert) {
-        const queries: string[] = []
-        for (let i = 0; i < insertions.insertions.length; i++) {
-            const insertion = insertions.insertions[i]
-            const queryStart = `INSERT INTO [${queryConfig.database}].[${queryConfig.schema}].[${queryConfig.table}]`
-            const queryFields = ` (${Object.keys(insertion).join(', ')})`
-            const queryValues = ` VALUES (${Object.keys(insertion).map(fieldName => this.convertJavascriptValueToSQL(insertion[fieldName]))})`
-            queries.push(queryStart + queryFields + queryValues)
-        }
-        return queries
+        return buildSQLQueryInsertions(
+            insertions,
+            {
+                dbId: this.dbId(queryConfig),
+            }
+        )
     }
 
     buildQueriesDelete(deletions: DatabaseObjectDelete[], queryConfig: QueryConfigDelete) {
-        const queries = []
-        for (let i = 0; i < deletions.length; i++) {
-            const whereStatements = "WHERE " + Object.keys(deletions[i].where).map(field =>
-                `${field} = ${this.convertJavascriptValueToSQL(deletions[i].where[field])}`
-            ).join(' AND ')
-            queries.push(`DELETE FROM [${queryConfig.database}].[${queryConfig.schema}].[${queryConfig.table}]
-${whereStatements}`)
-        }
-        return queries
+        return buildSQLQueryDeletions(
+            deletions,
+            {
+                dbId: this.dbId(queryConfig),
+            }
+        )
     }
 
-    buildQueriesUpdate(changes: DatabaseObjectUpdate[], config: QueryConfigUpdate) {
-        const queries = []
-        for (let i = 0; i < changes.length; i++) {
-            const whereStatements = "WHERE " + Object.keys(changes[i].where).map(field =>
-                `${field} = ${this.convertJavascriptValueToSQL(changes[i].where[field])}`
-            ).join(' AND ')
-            const setStatements = "SET " + Object.keys(changes[i].update).map(field =>
-                `${field} = ${this.convertJavascriptValueToSQL(changes[i].update[field])}`
-            ).join(',')
-            queries.push(`UPDATE [${config.database}].[${config.schema}].[${config.table}]
-${setStatements}
-${whereStatements}`)
-        }
-        return queries
+    buildQueriesUpdate(changes: DatabaseObjectUpdate[], queryConfig: QueryConfigUpdate) {
+        return buildSQLQueryUpdates(
+            changes,
+            {
+                dbId: this.dbId(queryConfig),
+            }
+        )
+    }
+
+    private dbId(queryConfig: QueryConfigBase) {
+        return `[${queryConfig.database}].[${queryConfig.schema}].[${queryConfig.table}]`
     }
 
     async executeQuery(query: string): Promise<QueryResult> {
@@ -287,16 +278,6 @@ ${whereStatements}`)
             flags.push('notnull')
         }
         return flags
-    }
-
-    private convertJavascriptValueToSQL(val: any) {
-        if (val === null) {
-            return 'NULL'
-        }
-        if (typeof val === 'number') {
-            return val
-        }
-        return `'${val}'`
     }
 
     private async query(query: string) {
