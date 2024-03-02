@@ -3,6 +3,7 @@
 ## [0.2.1] 02.03.2024
 - Fixed a bug which caused wrong `NULL` where conditions in `MySQL`, `PostgreSQL`, `MariaDB` and `MSSQL` (e.g could not update data where `NULL` was involved)
 - Rename configuration option `SmileDB.tree.expandTablesInstant` to `SmileDB.tree.expandTablesInstantly`
+- Improve the naming and item order of the table right click menu
 
 ## [0.2.1] 24.02.2024
 
