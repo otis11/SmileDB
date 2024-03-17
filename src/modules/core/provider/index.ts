@@ -6,6 +6,7 @@ export * from './PoolConnectionTreeItem'
 export * from './PoolConnectionTreeProvider'
 export * from './ProcedureTreeItem'
 export * from './SchemaTreeItem'
+export * from './SearchTreeItem'
 export * from './TableTreeItem'
 export * from './WorkspaceTreeItem'
 

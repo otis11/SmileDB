@@ -1,11 +1,12 @@
 import * as vscode from 'vscode'
 import { copyToClipboard, deletePoolConnectionConfig, getConnectionClientModule, getConnectionClientModules, getPoolConnection, registerCommand, resetPoolConnectionConfigs, showMessage, showQuickPickConnectionConfigs } from './common'
-import { PoolConnectionTreeProvider, } from './provider'
+import { PoolConnectionTreeProvider } from './provider'
 import { Module, PoolConnectionConfig } from './types'
 import { renderActiveConnectionsApp } from './webviews/active-connections/app'
 import { renderCodeApp } from './webviews/code/app'
 import { renderEditConnectionApp } from './webviews/edit-connection/app'
 import { renderHelpApp } from './webviews/help/app'
+import { renderSearchApp } from './webviews/search/app'
 import { renderTableApp } from './webviews/table/app'
 
 export const coreModule: Module = {
@@ -127,6 +128,10 @@ export const coreModule: Module = {
             } else {
                 vscode.window.showInformationMessage('Only available by right clicking on a tree item.')
             }
+        })
+
+        registerCommand('SmileDB.openSearch', () => {
+            renderSearchApp()
         })
     }
 }

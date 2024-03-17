@@ -1,0 +1,8 @@
+.d-none {
+    display: none;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+}

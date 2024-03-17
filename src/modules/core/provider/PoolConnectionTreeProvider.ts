@@ -3,6 +3,7 @@ import { getConnectionClientModule, getPoolConnectionConfigs } from '../common'
 import { ErrorTreeItem } from './ErrorTreeItem'
 import { GlobalTreeItem } from './GlobalTreeItem'
 import { PoolConnectionTreeItem } from './PoolConnectionTreeItem'
+import { SearchTreeItem } from './SearchTreeItem'
 import { WorkspaceTreeItem } from './WorkspaceTreeItem'
 
 export class PoolConnectionTreeProvider implements TreeDataProvider<TreeItem> {
@@ -14,6 +15,7 @@ export class PoolConnectionTreeProvider implements TreeDataProvider<TreeItem> {
         if (!element) {
             // root element, return all pool connections
             return Promise.resolve([
+                new SearchTreeItem(),
                 new WorkspaceTreeItem(),
                 new GlobalTreeItem(),
             ])

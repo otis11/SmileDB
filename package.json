@@ -172,6 +172,12 @@
                 "command": "SmileDB.copyTreeItemDescription",
                 "category": "SmileDB",
                 "title": "Copy Description"
+            },
+            {
+                "command": "SmileDB.openSearch",
+                "title": "Search",
+                "category": "SmileDB",
+                "icon": "$(search)"
             }
         ],
         "configuration": {
