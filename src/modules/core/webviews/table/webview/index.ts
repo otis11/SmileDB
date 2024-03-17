@@ -17,7 +17,8 @@ import { closePopup } from "./popup"
 import { onPushChangesClick, renderPushChanges, updateOnPushChangesState, updatePushChangesLoadingState } from "./push"
 import { getQueryResult, openQueriesPreview, requestExecuteQueryFetch, setQueryResult, setQueryResultChanges, setQueryResultDeletions, setQueryResultInsertions, setQueryResultTimeInMilliseconds, updateQueryTimeInMilliseconds } from "./query"
 import { renderTable, renderTableResult } from "./table"
-import { copySelectedColumns, renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode } from "./tableSelectionMode"
+import { copySelectedColumns, renderSelectionMode, setEditMode, toggleSelectionMode, updateSelectionMode, updateSelectionModeMenuOptions } from "./tableSelectionMode"
+import { PoolConnectionConfig } from "../../../types"
 
 provideVSCodeDesignSystem().register(
     vsCodeButton(),
@@ -123,7 +124,10 @@ onConfigLoad((config => {
     requestExecuteQueryFetch()
     setEditMode(config.table.defaultEditMode)
 }))
-onConnectionConfigLoad(renderFilterOptions)
+onConnectionConfigLoad((connectionConfig: PoolConnectionConfig) => {
+    renderFilterOptions(connectionConfig)
+    updateSelectionModeMenuOptions(connectionConfig.advanced.readonly)
+})
 renderPagination()
 renderTable()
 renderPushChanges()

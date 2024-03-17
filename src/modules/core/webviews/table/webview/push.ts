@@ -1,3 +1,4 @@
+import { getConnectionConfig } from "../../webview-helper/connectionConfig"
 import { getQueryResultChanges, getQueryResultDeletions, getQueryResultInsertions, requestExecuteQueries, requestExecuteQueriesPreview } from "./query"
 
 const pushChangesElement = document.getElementById("push-changes")
@@ -21,6 +22,9 @@ export function updateOnPushChangesState() {
 export function onPushChangesClick() {
     if (pushChangesElement?.classList.contains('disabled')) {
         return // nothing change
+    }
+    if (getConnectionConfig()?.advanced.readonly) {
+        return // do nothing when readonly
     }
     updatePushChangesLoadingState(true)
     requestExecuteQueries()

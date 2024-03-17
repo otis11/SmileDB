@@ -235,7 +235,7 @@ function getHtmlBody(connectionConfig: PoolConnectionConfig): string {
             </div>
     </div>
     <div id="readonly-notice" class=" ${connectionConfig.advanced.readonly ? '' : 'd-none'}">
-        <div><i class="codicon codicon-lock"></i></div>
+        <i class="codicon codicon-lock"></i>
         <div class="readonly-text">Readonly. Edit your connection configuration to modify.</div>
     </div>
     <div id="loading">Loading...</div>

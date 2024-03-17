@@ -1,4 +1,5 @@
 import { AllowedFilterMethod, PoolConnectionConfig } from "../../../types"
+import { getConnectionConfig } from "../../webview-helper/connectionConfig"
 import { getQueryResult, requestExecuteQuery, requestExecuteQueryFetch } from "./query"
 import { renderSelectWithId } from "./select"
 import { getTableElement } from "./table"
@@ -86,6 +87,10 @@ function renderActiveFilter() {
         headerFilterQueryElement?.classList.remove('d-none')
         filterInputDatabaseString = headerFilterDatabaseInputElement?.value || ''
         filterInputClientString = ''
+        if (getConnectionConfig()?.advanced.readonly) {
+            headerFilterQueryInputElement.setAttribute('readonly', '')
+            headerFilterQueryInputElement.innerText = 'In readonly mode queries are disabled!'
+        }
     }
 
     // update table selection mode offset

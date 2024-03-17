@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.2.4] 17.03.2024
+- Improve Readme and extension description
+    - Make it more clear which database system are supported
+    - Make it clear that this extension is currently not actively maintained
+    - Make it more clear which features are available
+- Readonly Mode
+    - Small style changes
+    - Disable queries
+    - Disable table right click context menu multiple data changing options
+    - Disable pushing anything from the client
 ## [0.2.3] 02.03.2024
 - Fixed a bug which caused `MongoDB` to convert a `null` value into the string `"null"`
 

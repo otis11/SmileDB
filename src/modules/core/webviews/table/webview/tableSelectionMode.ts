@@ -1,3 +1,4 @@
+import { getConnectionConfig } from "../../webview-helper/connectionConfig"
 import { copyToClipboard } from "../../webview-helper/copyToClipboard"
 import { logError } from "../../webview-helper/logger"
 import { selectTextInContentEditableDiv } from "../../webview-helper/selectTextInContentEditableDiv"
@@ -110,7 +111,9 @@ function onSelectionModeContextMenu(e: MouseEvent) {
     if (queryResult?.fields[contextMenuTopLeftPosition.col].flags.includes('notnull')) {
         tableSelectionContextMenuSetNullElement.classList.add('disabled')
     } else {
-        tableSelectionContextMenuSetNullElement.classList.remove('disabled')
+        if (!getConnectionConfig()?.advanced.readonly) {
+            tableSelectionContextMenuSetNullElement.classList.remove('disabled')
+        }
     }
 }
 
@@ -306,4 +309,14 @@ export function renderSelectionModeContextMenu() {
             tableSelectionContextMenuElement.style.display = 'none'
         }
     })
+}
+
+export function updateSelectionModeMenuOptions(readonly: boolean) {
+    if (readonly) {
+        tableSelectionContextMenuDeleteRowsClearElement.classList.add('disabled')
+        tableSelectionContextMenuDeleteRowClearElement.classList.add('disabled')
+        tableSelectionContextMenuDeleteRowsElement.classList.add('disabled')
+        tableSelectionContextMenuDeleteRowElement.classList.add('disabled')
+        tableSelectionContextMenuSetNullElement.classList.add('disabled')
+    }
 }
