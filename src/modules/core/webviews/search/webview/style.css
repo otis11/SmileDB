@@ -1,8 +1,26 @@
-.d-none {
-    display: none;
+.row-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--color-disabled);
 }
 
 .row {
-    display: flex;
-    align-items: center;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.row:hover {
+    background-color: var(--color-primary);
+}
+
+#search {
+    width: 100%;
+    margin-top: 4px;
+}
+
+#connections {
+    margin-bottom: 4px;
 }

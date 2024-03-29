@@ -1,10 +1,10 @@
-import { provideVSCodeDesignSystem, vsCodeCheckbox, vsCodeDataGrid, vsCodeDataGridCell, vsCodeDataGridRow, vsCodeDivider, vsCodeProgressRing, vsCodeTextField } from "@vscode/webview-ui-toolkit"
+import { provideVSCodeDesignSystem, vsCodeCheckbox, vsCodeDivider, vsCodeProgressRing, vsCodeTextField } from "@vscode/webview-ui-toolkit"
 import { PoolConnectionConfig } from "../../../types"
 import { vscode } from "../../webview-helper/vscode"
 
 const connectionsContainer = document.getElementById('connections') as HTMLDivElement
 const loadingElement = document.getElementById('loading') as HTMLDivElement
-const searchElement = document.getElementById('search') as HTMLDivElement
+const searchElement = document.getElementById('search') as HTMLInputElement
 const resultsElement = document.getElementById('results') as HTMLDivElement
 let selectedConnectionConfigNames: string[] = []
 let connectionConfigs: PoolConnectionConfig[] = []
@@ -14,9 +14,6 @@ provideVSCodeDesignSystem().register(
     vsCodeTextField(),
     vsCodeCheckbox(),
     vsCodeProgressRing(),
-    vsCodeDataGrid(),
-    vsCodeDataGridCell(),
-    vsCodeDataGridRow()
 )
 
 window.addEventListener('message', event => {
@@ -28,12 +25,14 @@ window.addEventListener('message', event => {
     if (message.command === 'load.data.result') {
         loadingElement.classList.add('d-none')
         resultsElement.innerHTML = message.payload.map(p => `
-        <vscode-data-grid-row>
-            <vscode-data-grid-cell>${p.name}</vscode-data-cell>
-            <vscode-data-grid-cell>${p.database}</vscode-data-cell>
-            <vscode-data-grid-cell>${p.connection}</vscode-data-cell>
-            <vscode-data-grid-cell>${p.type}</vscode-data-cell>
-        </vscode-data-grid-row>
+        <div class="row">
+            <div class="row-title">${p.name}</div>
+            <div class="row-info">
+                <div class="row-text">${p.database}</div>
+                <div class="row-text">${p.connection}</div>
+                <div class="row-text">${p.type}</div>
+            </div>
+        </div>
         `).join('')
     }
 })
@@ -62,3 +61,38 @@ connectionsContainer.addEventListener('change', (e) => {
         }
     })
 })
+
+searchElement.addEventListener('input', () => {
+    applyClientSearch()
+})
+
+function applyClientSearch() {
+    const search = searchElement.value
+    // emtpy search? show all children
+    if (search.trim() === '') {
+        Array.from(resultsElement.children).forEach((child) => {
+            child.classList.remove('d-none')
+        })
+        return
+    }
+
+    Array.from(resultsElement.children).forEach((child) => {
+        const text = child.textContent
+        if (includesAllWords(search, text)) {
+            child.classList.remove('d-none')
+        } else {
+            child.classList.add('d-none')
+        }
+    })
+}
+
+function includesAllWords(search, text) {
+    const searchWords = search.toLowerCase().split(/[ \n]/gmi)
+    let includesAllWords = true
+    searchWords.forEach((word) => {
+        if (!text.toLowerCase().includes(word)) {
+            includesAllWords = false
+        }
+    })
+    return includesAllWords
+}

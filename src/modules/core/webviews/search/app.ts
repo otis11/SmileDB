@@ -101,7 +101,7 @@ function getHtmlBody(): string {
         <h2>Available Connections</h2>
         <div id="connections"></div>
         <vscode-divider></vscode-divider>
-        <vscode-text-field id="search"></vscode-text-field>
+        <vscode-text-field id="search" placeholder="Search..."></vscode-text-field>
         <div id="loading" class="d-none">
             <vscode-progress-ring></vscode-progress-ring>
         </div>
