@@ -2,6 +2,7 @@ import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
 import { MySQLPoolConnection } from "../../../mysql/MySQLPoolConnection"
 import { getIconDarkLightPaths, getPoolConnection, getPoolConnectionConfigsAll, logError } from "../../common"
 import { PoolConnectionConfig } from "../../types"
+import { renderTableApp } from "../table/app"
 
 export function renderSearchApp() {
     const id = `search`
@@ -18,6 +19,7 @@ export function renderSearchApp() {
         onWebviewMessage,
         iconPath: getIconDarkLightPaths('help.svg'),
         htmlBody: getHtmlBody(),
+        retainContextWhenHidden: true,
     }
 
     renderWebviewApp(app)
@@ -91,6 +93,16 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
             }
         }
         app.panel?.webview.postMessage({ command: `load.data.result`, payload: data })
+    } else if (command === "open") {
+        const connectionConfig = getPoolConnectionConfigsAll().find(p => p.name === payload.connection)
+        if (!connectionConfig) {
+            return
+        }
+
+        connectionConfig.connection.database = payload.database
+        if (payload.type === 'table') {
+            renderTableApp(connectionConfig, payload.name)
+        }
     }
 }
 

@@ -24,3 +24,8 @@
 #connections {
     margin-bottom: 4px;
 }
+
+.row-info,
+.row-title {
+    pointer-events: none;
+}

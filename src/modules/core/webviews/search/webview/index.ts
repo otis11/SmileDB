@@ -25,7 +25,7 @@ window.addEventListener('message', event => {
     if (message.command === 'load.data.result') {
         loadingElement.classList.add('d-none')
         resultsElement.innerHTML = message.payload.map(p => `
-        <div class="row">
+        <div class="row" data-name="${p.name}" data-type="${p.type}" data-database="${p.database}" data-connection="${p.connection}">
             <div class="row-title">${p.name}</div>
             <div class="row-info">
                 <div class="row-text">${p.database}</div>
@@ -64,6 +64,24 @@ connectionsContainer.addEventListener('change', (e) => {
 
 searchElement.addEventListener('input', () => {
     applyClientSearch()
+})
+
+resultsElement.addEventListener('click', (e) => {
+    const row = e.target as HTMLDivElement
+    const connection = row.getAttribute('data-connection')
+    const type = row.getAttribute('data-type')
+    const name = row.getAttribute('data-name')
+    const database = row.getAttribute('data-database')
+
+    vscode.postMessage({
+        command: 'open',
+        payload: {
+            connection,
+            type,
+            name,
+            database,
+        }
+    })
 })
 
 function applyClientSearch() {
