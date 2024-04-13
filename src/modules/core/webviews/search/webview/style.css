@@ -29,3 +29,8 @@
 .row-title {
     pointer-events: none;
 }
+
+.stats {
+    display: flex;
+    color: var(--color-disabled);
+}

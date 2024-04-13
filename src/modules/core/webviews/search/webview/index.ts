@@ -6,6 +6,7 @@ const connectionsContainer = document.getElementById('connections') as HTMLDivEl
 const loadingElement = document.getElementById('loading') as HTMLDivElement
 const searchElement = document.getElementById('search') as HTMLInputElement
 const resultsElement = document.getElementById('results') as HTMLDivElement
+const statsTablesElement = document.getElementById('stats-tables') as HTMLDivElement
 let selectedConnectionConfigNames: string[] = []
 let connectionConfigs: PoolConnectionConfig[] = []
 
@@ -34,6 +35,7 @@ window.addEventListener('message', event => {
             </div>
         </div>
         `).join('')
+        statsTablesElement.innerHTML = `${message.payload.filter(x => x.type === 'table').length} tables`
     }
 })
 

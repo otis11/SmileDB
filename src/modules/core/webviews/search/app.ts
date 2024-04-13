@@ -72,23 +72,27 @@ async function onWebviewMessage(app: WebviewApp, message: WebviewAppMessage) {
                 } catch (e) { logError(e) }
 
                 try {
-                    const procedures = await dbConn.fetchProcedures()
-                    data.push(...procedures.map(table => ({
-                        type: 'procedure',
-                        database,
-                        name: table,
-                        connection: connection.config.name
-                    })))
+                    if ('fetchProcedures' in dbConn) {
+                        const procedures = await dbConn.fetchProcedures()
+                        data.push(...procedures.map(table => ({
+                            type: 'procedure',
+                            database,
+                            name: table,
+                            connection: connection.config.name
+                        })))
+                    }
                 } catch (e) { logError(e) }
 
                 try {
-                    const functions = await dbConn.fetchFunctions()
-                    data.push(...functions.map(table => ({
-                        type: 'function',
-                        database,
-                        name: table,
-                        connection: connection.config.name
-                    })))
+                    if ('fetchFunctions' in dbConn) {
+                        const functions = await dbConn.fetchFunctions()
+                        data.push(...functions.map(table => ({
+                            type: 'function',
+                            database,
+                            name: table,
+                            connection: connection.config.name
+                        })))
+                    }
                 } catch (e) { logError(e) }
             }
         }
@@ -116,6 +120,9 @@ function getHtmlBody(): string {
         <vscode-text-field id="search" placeholder="Search..."></vscode-text-field>
         <div id="loading" class="d-none">
             <vscode-progress-ring></vscode-progress-ring>
+        </div>
+        <div class="stats">
+            <div id="stats-tables"></div>
         </div>
         <vscode-data-grid id="results"></vscode-data-grid>
     </div>
