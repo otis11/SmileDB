@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.2.5] 24.07.2024
+- Fixed a bug which caused scrollbars to appear on each table column with to much content making these unreadable
+
 ## [0.2.4] 17.03.2024
 - Improve Readme and extension description
     - Make it more clear which database system are supported
