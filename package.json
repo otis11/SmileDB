@@ -2,7 +2,7 @@
     "name": "smiledb",
     "displayName": "SmileDB",
     "description": "Interact with MySQL, PostgreSQL, MSSQL, MongoDB, MariaDB and Redis inside VSCode.",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "icon": "resources/logo.png",
     "pricing": "Free",
     "engines": {
