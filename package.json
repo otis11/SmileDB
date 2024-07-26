@@ -191,6 +191,16 @@
                     "default": false,
                     "description": "If inside the connections tree view the tables folder should be expanded instant."
                 },
+                "SmileDB.table.retainContextWhenHidden": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Retain context when webview tab is hidden. Can lead to extensive ram usage. Disable if necessary."
+                },
+                "SmileDB.editConnection.retainContextWhenHidden": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Retain context when webview tab is hidden. Can lead to extensive ram usage. Disable if necessary."
+                },
                 "SmileDB.table.pageResultsLimit": {
                     "default": 100,
                     "type": "integer",

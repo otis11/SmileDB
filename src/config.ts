@@ -11,7 +11,11 @@ export function getConfig() {
             logLevel: LogLevel.debug,
             messageDisplay: vsconfig.get('general.messageDisplay') as 'Information Message' | 'Status Bar',
         },
+        editConnection: {
+            retainContextWhenHidden: vsconfig.get('editConnection.retainContextWhenHidden') as boolean,
+        },
         table: {
+            retainContextWhenHidden: vsconfig.get('table.retainContextWhenHidden') as boolean,
             pageResultsLimit: vsconfig.get('table.pageResultsLimit') as number | string,
             defaultEditMode: vsconfig.get('table.defaultEditMode') as 'Edit' | 'Select',
             pageResultsLimitOptions: vsconfig.get('table.pageResultsLimitOptions') as number[],

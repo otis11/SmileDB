@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.2.6] 26.07.2024
+- `table` and `edit-connection` webviews retain context when hidden
+- Add configuration options to retain webview context
+    - `SmileDB.editConnection.retainContextWhenHidden` to enable or disable retaining the webview context for all edit connection webviews. Default: `true`
+    - `SmileDB.table.retainContextWhenHidden` to enable or disable retaining the webview context for all table webviews. Default: `true`
+
 ## [0.2.5] 24.07.2024
 - Fixed a bug which caused scrollbars to appear on each table column with to much content making these unreadable
 

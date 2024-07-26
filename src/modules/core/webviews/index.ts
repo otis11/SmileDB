@@ -14,6 +14,7 @@ export interface WebviewApp {
     panel?: WebviewPanel,
     connectionConfig?: PoolConnectionConfig
     table?: string,
+    retainContextWhenHidden?: boolean
 }
 
 export type WebviewAppMessage = {
@@ -30,6 +31,7 @@ export function renderWebviewApp(app: WebviewApp) {
         app.title,
         ViewColumn.One,
         {
+            retainContextWhenHidden: app.retainContextWhenHidden,
             // Enable JavaScript in the webview
             enableScripts: true,
             // Restrict the webview to only load resources from the `dist`

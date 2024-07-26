@@ -25,6 +25,7 @@ export function renderTableApp(
         htmlBody: getHtmlBody(config),
         connectionConfig: config,
         table,
+        retainContextWhenHidden: getConfig().table.retainContextWhenHidden
     }
 
     renderWebviewApp(app)

@@ -2,6 +2,7 @@ import { commands, window } from "vscode"
 import { WebviewApp, WebviewAppMessage, getApp, renderWebviewApp } from ".."
 import { getConnectionClientModule, getIconDarkLightPaths, logError, refreshPoolConnection, storePoolConnectionConfig } from "../../common"
 import { PoolConnectionConfig } from "../../types"
+import { getConfig } from "../../../../config"
 
 export function renderEditConnectionApp(config: PoolConnectionConfig) {
     const id = `connection.edit.${config.id}`
@@ -19,6 +20,7 @@ export function renderEditConnectionApp(config: PoolConnectionConfig) {
         iconPath: getIconDarkLightPaths(getConnectionClientModule(config.moduleName).icon),
         htmlBody: getHtmlBody(config),
         connectionConfig: config,
+        retainContextWhenHidden: getConfig().editConnection.retainContextWhenHidden
     }
 
     renderWebviewApp(app)
