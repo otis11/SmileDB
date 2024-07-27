@@ -4,7 +4,7 @@ import { openWebviewConfig } from "../webview"
 
 export function openCodeWebview(config: { title: string, code: string }) {
     openWebviewConfig({
-        id: 'code',
+        id: 'code.' + config.title,
         title: config.title,
         webviewPath: ['code'],
         onWebviewMessage,

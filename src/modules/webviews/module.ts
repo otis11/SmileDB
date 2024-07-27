@@ -94,7 +94,7 @@ export const webviewsModule: Module = {
             }
             // @ts-ignore
             const result = await getPoolConnection(config).fetchFunction(name)
-            openCodeWebview({ code: result, title: "Procedure: " + name })
+            openCodeWebview({ code: result, title: "Function: " + name })
         })
     }
 }
