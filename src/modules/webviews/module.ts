@@ -8,6 +8,7 @@ import { openTableWebview } from "./table/webview-backend"
 import { openHelpWebview } from "./help/webview-backend"
 import { openCodeWebview } from "./code/webview-backend"
 import { openActiveConnectionsWebview } from "./active-connections/webview-backend"
+import { getPoolConnection } from "../../shared/database-connections"
 
 export const webviewsModule: Module = {
     name: 'Webviews',
@@ -67,6 +68,33 @@ export const webviewsModule: Module = {
 
         registerCommand('SmileDB.openActiveConnections', () => {
             openActiveConnectionsWebview()
+        })
+
+        registerCommand('SmileDB.openProcedure', async (
+            config: PoolConnectionConfig,
+            name: string,
+        ) => {
+            if (!config || !name) {
+                // todo make available via quickpick?
+                window.showInformationMessage('To open a procedure click on a procedure inside the tree view. This is not available via the command prompt.')
+                return
+            }
+            // @ts-ignore
+            const result = await getPoolConnection(config).fetchProcedure(name)
+            openCodeWebview({ code: result, title: "Procedure: " + name })
+        })
+        registerCommand('SmileDB.openFunction', async (
+            config: PoolConnectionConfig,
+            name: string,
+        ) => {
+            if (!config || !name) {
+                // todo make available via quickpick?
+                window.showInformationMessage('To open a function click on a function inside the tree view. This is not available via the command prompt.')
+                return
+            }
+            // @ts-ignore
+            const result = await getPoolConnection(config).fetchFunction(name)
+            openCodeWebview({ code: result, title: "Procedure: " + name })
         })
     }
 }
