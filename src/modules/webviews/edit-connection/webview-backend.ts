@@ -11,7 +11,7 @@ import { storePoolConnectionConfig } from "../../../shared/connection-config"
 
 export function openEditConnectionWebview(config: PoolConnectionConfig) {
     openWebviewConfig({
-        id: `connection.edit.${config.id}`,
+        id: `connection.edit.${config.moduleName}.${config.id}`,
         title: config.id === -1 ? `New ${config.moduleName} Connection` : `Edit ${config.name}`,
         webviewPath: ['edit-connection'],
         onWebviewMessage,
