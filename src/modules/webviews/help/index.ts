@@ -10,7 +10,7 @@ provideVSCodeDesignSystem().register(
 document.getElementById('go-to-settings')?.addEventListener('click', () => {
     webviewVscode.postMessage({
         command: 'workbench.action.openSettings',
-        payload: 'SmileDB'
+        payload: '@ext:otis11.smiledb'
     })
 })
 
