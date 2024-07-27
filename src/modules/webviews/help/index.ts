@@ -13,3 +13,10 @@ document.getElementById('go-to-settings')?.addEventListener('click', () => {
         payload: 'SmileDB'
     })
 })
+
+document.getElementById('go-to-active-connections')?.addEventListener('click', () => {
+    webviewVscode.postMessage({
+        command: 'SmileDB.openActiveConnections',
+        payload: 'SmileDB'
+    })
+})

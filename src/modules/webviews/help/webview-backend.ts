@@ -17,9 +17,7 @@ export function openHelpWebview() {
 async function onWebviewMessage(webviewConfig: WebviewConfig, message: WebviewMessage) {
     const { command, payload } = message
 
-    if (command === "workbench.action.openSettings") {
-        commands.executeCommand(command, payload)
-    }
+    commands.executeCommand(command, payload)
 }
 
 function getHtmlBody(): string {
@@ -28,6 +26,7 @@ function getHtmlBody(): string {
         <h2>Hello! :)</h2>
         <vscode-divider></vscode-divider>
         <vscode-link href="#" id="go-to-settings">Open UI Settings</vscode-link>
+        <vscode-link href="#" id="go-to-active-connections">Open Active Connections</vscode-link>
         <vscode-link href="https://github.com/otis11/SmileDB/blob/main/docs/usage.md">Documentation [GitHub]</vscode-link>
     </div>
     `

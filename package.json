@@ -50,12 +50,12 @@
                 {
                     "command": "SmileDB.newConnection",
                     "when": "view == SmileDB",
-                    "group": "navigation@2"
+                    "group": "navigation@3"
                 },
                 {
                     "command": "SmileDB.help",
                     "when": "view == SmileDB",
-                    "group": "navigation@3"
+                    "group": "navigation@2"
                 }
             ],
             "view/item/context": [
