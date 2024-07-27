@@ -44,6 +44,8 @@ async function onWebviewMessage(webviewConfig: WebviewConfig, message: WebviewMe
 
     const connection = getPoolConnection(webviewConfig.connectionConfig)
 
+    console.log(message, 'table message shit wtf')
+
     if (command === "query.execute.fetch") {
         try {
             const data = await connection.executeQueriesAndFetch([], queryConfig)
@@ -119,8 +121,8 @@ async function onWebviewMessage(webviewConfig: WebviewConfig, message: WebviewMe
         webviewConfig.panel?.webview.postMessage({ command: `load.connectionConfig`, payload: webviewConfig.connectionConfig })
     }
 
-    if (command === "load.config") {
-        webviewConfig.panel?.webview.postMessage({ command: `load.config`, payload: getExtensionConfig() })
+    if (command === "load.extensionConfig") {
+        webviewConfig.panel?.webview.postMessage({ command: `load.extensionConfig`, payload: getExtensionConfig() })
     }
 
     if (command === "workbench.action.openSettings") {
