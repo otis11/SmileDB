@@ -10,10 +10,11 @@ const FLAGS = {
 };
 
 fs.rmSync('./dist', { recursive: true, force: true });
+fs.mkdirSync('./esbuild-meta', { recursive: true });
 
 (async () => {
     // build webviews
-    await build({
+    const webviewsResult = await build({
         entryPoints: [
             './src/modules/webviews/webview-global.css',
             './src/modules/webviews/table/index.ts',
@@ -24,13 +25,14 @@ fs.rmSync('./dist', { recursive: true, force: true });
         ],
         minify: args.includes(FLAGS.minify),
         outdir: './dist/webviews',
+        metafile: true,
         bundle: true,
         logLevel: 'info',
         watch: args.includes(FLAGS.watch),
     });
 
     // build extension backend
-    const res = await build({
+    const extensionResult = await build({
         entryPoints: [
             './src/extension.ts',
         ],
@@ -39,6 +41,7 @@ fs.rmSync('./dist', { recursive: true, force: true });
         outdir: './dist',
         platform: 'node',
         format: 'cjs',
+        metafile: true,
         minify: args.includes(FLAGS.minify),
         sourcemap: args.includes(FLAGS.sourcemap),
         external: [
@@ -61,4 +64,8 @@ fs.rmSync('./dist', { recursive: true, force: true });
             }),
         ],
     });
+
+    // go to https://esbuild.github.io/analyze/
+    fs.writeFileSync('./esbuild-meta/webviews.json', JSON.stringify(webviewsResult.metafile))
+    fs.writeFileSync('./esbuild-meta/extension.json', JSON.stringify(extensionResult.metafile))
 })();
