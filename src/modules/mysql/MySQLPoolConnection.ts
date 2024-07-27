@@ -1,6 +1,8 @@
 import { FieldPacket, Pool, createPool } from "mysql2/promise"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLPoolConnection, Timer, buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from "../core"
 import { mysqlTypeMap } from "./types"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLPoolConnection } from "../../shared/types"
+import { Timer } from "../../shared/timer"
+import { buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from "../../shared/sql"
 
 export class MySQLPoolConnection implements SQLPoolConnection {
     private pool: Pool
@@ -248,6 +250,11 @@ ${limit}`
     private getQueryResultFieldFlags(field: FieldPacket): QueryResultFieldFlag[] {
         // https://github.com/sidorares/node-mysql2/blob/master/lib/constants/field_flags.js
         const flags: QueryResultFieldFlag[] = []
+        if(Array.isArray(field.flags)) {
+            // TODO handle fields as string array
+            return []
+        }
+
         if ((field.flags & 512) !== 0) {
             flags.push('autoincrement')
         }

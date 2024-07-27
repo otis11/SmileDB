@@ -1,6 +1,11 @@
 import { TreeItem, TreeItemCollapsibleState } from "vscode"
-import { DatabaseTreeItem, FolderTreeItem, PoolConnectionTreeItem, TableTreeItem, getPoolConnection, loadAndCreateTreeItem } from "../core"
 import { MongoDBPoolConnection } from "./MongoDBPoolConnection"
+import { PoolConnectionTreeItem } from "../treeview/PoolConnectionTreeItem"
+import { getPoolConnection } from "../../shared/database-connections"
+import { DatabaseTreeItem } from "../treeview/DatabaseTreeItem"
+import { FolderTreeItem } from "../treeview/FolderTreeItem"
+import { loadAndCreateTreeItem } from "../treeview/get-database-tree-children"
+import { TableTreeItem } from "../treeview/TableTreeItem"
 
 export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[]> {
     if (item instanceof PoolConnectionTreeItem) {

@@ -1,5 +1,7 @@
 import Redis from 'ioredis'
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigFetch, QueryResultField, QueryResultRow, Timer, jsonStringify } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigFetch, QueryResultField, QueryResultRow } from '../../shared/types'
+import {Timer} from '../../shared/timer'
+import { jsonStringify } from '../../shared/helper'
 
 const REDIS_START_COMMAND_KEYWORDS = [
     'set', 'get', 'del', 'hset', 'hget', 'scan', 'select',

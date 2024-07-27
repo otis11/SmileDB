@@ -1,11 +1,12 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import { QueryResultRow } from "pg"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, Timer } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, PoolConnection, PoolConnectionConfig, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag } from "../../shared/types"
+import { Timer } from '../../shared/timer'
 
 export class MongoDBPoolConnection implements PoolConnection {
     private client: MongoClient
+    // do not remove, is used
     private mdbObjectId = ObjectId
-
 
     constructor(public config: PoolConnectionConfig) {
         // mongodb://[[username][:password]@][host][:port][?option1&option2...]

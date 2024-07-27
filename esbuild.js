@@ -9,24 +9,25 @@ const FLAGS = {
     minify: '--minify',
 };
 
+fs.rmSync('./dist', { recursive: true, force: true });
+
 (async () => {
     // build webviews
-    // example: dist/webviews/help/webview/style.css
-    const webviewFiles = getFilePathsRecursive('./src/modules/core/webviews', '/webview/');
-    // add global css
-    webviewFiles.push('./src/modules/core/webviews/global.css')
-    for (let i = 0; i < webviewFiles.length; i++) {
-        await build({
-            entryPoints: [
-                webviewFiles[i],
-            ],
-            minify: args.includes(FLAGS.minify),
-            outdir: './dist/' + webviewFiles[i].slice(webviewFiles[i].indexOf('webview'), webviewFiles[i].lastIndexOf('/')),
-            bundle: true,
-            logLevel: 'info',
-            watch: args.includes(FLAGS.watch),
-        });
-    }
+    await build({
+        entryPoints: [
+            './src/modules/webviews/webview-global.css',
+            './src/modules/webviews/table/index.ts',
+            './src/modules/webviews/edit-connection/index.ts',
+            './src/modules/webviews/code/index.ts',
+            './src/modules/webviews/help/index.ts',
+            './src/modules/webviews/active-connections/index.ts',
+        ],
+        minify: args.includes(FLAGS.minify),
+        outdir: './dist/webviews',
+        bundle: true,
+        logLevel: 'info',
+        watch: args.includes(FLAGS.watch),
+    });
 
     // build extension backend
     const res = await build({
@@ -61,22 +62,3 @@ const FLAGS = {
         ],
     });
 })();
-
-function getFilePathsRecursive(root, filePathIncludes) {
-    let filesFiltered = [];
-    const files = fs.readdirSync(root);
-    for (let i = 0; i < files.length; i++) {
-        const filePath = `${root}/${files[i]}`;
-        const stat = fs.lstatSync(filePath);
-        if (stat.isDirectory()) {
-            filesFiltered = [
-                ...getFilePathsRecursive(filePath, filePathIncludes),
-                ...filesFiltered
-            ];
-        }
-        else if (stat.isFile() && filePath.includes(filePathIncludes)) {
-            filesFiltered.push(filePath);
-        }
-    }
-    return filesFiltered;
-}
