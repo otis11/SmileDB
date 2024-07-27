@@ -47,7 +47,6 @@ export class PoolConnectionTreeProvider implements TreeDataProvider<TreeItem> {
             return Promise.resolve(items)
         } catch (e: any) {
             // generic error tree item when module throws error
-            console.log(e, e.message)
             return Promise.resolve([new ErrorTreeItem(e.message || e.code, el.connectionConfig)])
         }
 

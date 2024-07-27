@@ -44,8 +44,6 @@ async function onWebviewMessage(webviewConfig: WebviewConfig, message: WebviewMe
 
     const connection = getPoolConnection(webviewConfig.connectionConfig)
 
-    console.log(message, 'table message shit wtf')
-
     if (command === "query.execute.fetch") {
         try {
             const data = await connection.executeQueriesAndFetch([], queryConfig)
