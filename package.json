@@ -35,27 +35,27 @@
         "esbuild-base": "node esbuild.js",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-        "lint": "eslint src --fix --ext ts,js && npm run type",
-        "type": "tsc --noEmit -p .",
+        "lint": "eslint src --fix --ext ts,js && npm run type-check",
+        "type-check": "tsc --noEmit -p .",
         "rebuild": " ./node_modules/.bin/electron-rebuild -v \"22.3.14\""
     },
     "contributes": {
         "menus": {
             "view/title": [
                 {
-                    "command": "SmileDB.refreshConnections",
+                    "command": "SmileDB.refreshTreeConnections",
                     "when": "view == SmileDB",
                     "group": "navigation@1"
                 },
                 {
                     "command": "SmileDB.newConnection",
                     "when": "view == SmileDB",
-                    "group": "navigation@2"
+                    "group": "navigation@3"
                 },
                 {
                     "command": "SmileDB.help",
                     "when": "view == SmileDB",
-                    "group": "navigation@3"
+                    "group": "navigation@2"
                 }
             ],
             "view/item/context": [
@@ -118,15 +118,9 @@
                 "icon": "$(trash)"
             },
             {
-                "command": "SmileDB.refreshConnections",
+                "command": "SmileDB.refreshTreeConnections",
                 "category": "SmileDB",
                 "title": "Refresh Connections",
-                "icon": "$(refresh)"
-            },
-            {
-                "command": "SmileDB.refreshConnectionsSilent",
-                "category": "SmileDB",
-                "title": "Refresh Connections Silent",
                 "icon": "$(refresh)"
             },
             {

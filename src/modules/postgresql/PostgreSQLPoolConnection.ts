@@ -1,6 +1,8 @@
 import { FieldDef, Pool } from "pg"
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, SQLPoolConnection, Timer, buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from "../core"
 import { postgresqlTypeMap } from "./types"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResultField, QueryResultFieldFlag, SQLPoolConnection } from "../../shared/types"
+import { Timer } from "../../shared/timer"
+import {buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates} from "../../shared/sql"
 
 export type FieldConstraintsHashMap = Record<string, {
     is_auto_increment: 'YES' | 'NO'

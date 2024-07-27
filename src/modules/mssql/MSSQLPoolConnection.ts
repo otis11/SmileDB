@@ -1,5 +1,7 @@
 import { ConnectionPool } from 'mssql'
-import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLDatabaseStats, SQLPoolConnection, Timer, buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from "../core"
+import { DatabaseObjectDelete, DatabaseObjectInsert, DatabaseObjectUpdate, OrderByConfig, PoolConnectionConfig, QueryConfigBase, QueryConfigDelete, QueryConfigFetch, QueryConfigInsert, QueryConfigUpdate, QueryResult, QueryResultField, QueryResultFieldFlag, QueryResultRow, SQLDatabaseStats, SQLPoolConnection } from "../../shared/types"
+import { Timer } from '../../shared/timer'
+import { buildSQLQueryDeletions, buildSQLQueryInsertions, buildSQLQueryUpdates } from '../../shared/sql'
 
 export type MSSQLColumn = {
     name: string,

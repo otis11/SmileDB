@@ -1,6 +1,8 @@
 import { TreeItem } from "vscode"
-import { PoolConnectionTreeItem, TableTreeItem, getPoolConnection } from "../core"
 import { RedisPoolConnection } from "./RedisPoolConnection"
+import { PoolConnectionTreeItem } from "../treeview/PoolConnectionTreeItem"
+import { TableTreeItem } from "../treeview/TableTreeItem"
+import {getPoolConnection} from "../../shared/database-connections"
 
 export async function getDatabaseTreeChildren(item: TreeItem): Promise<TreeItem[]> {
     if (item instanceof PoolConnectionTreeItem) {

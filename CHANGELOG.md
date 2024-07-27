@@ -1,5 +1,19 @@
 # Change Log
 
+## Unreleased
+- Allow 1 new connection window per database module
+- Change the title when opening a database function to `Function: [FUNCTION_NAME]`
+- Move the help menu to the second position inside the connections tree view
+- Improve the results when opening settings from the help menu by using an extension filter
+- Add `open active connections` link inside the help webview
+- Remove command `SmileDB.refreshConnectionsSilent`
+- Refactor code & build
+  - move shared code from `core` module into a new `shared` folder
+  - rename multiple functions and variables to make code more readable
+  - move webviews into separate module
+  - move tree views into separate module
+  - on build generate esbuild meta files to analyze bundle size
+
 ## [0.2.6] 26.07.2024
 - `table` and `edit-connection` webviews retain context when hidden
 - Add configuration options to retain webview context
