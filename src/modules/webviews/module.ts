@@ -1,8 +1,8 @@
-import { showQuickPickConnectionConfigs } from "../../shared/connection-config"
-import { registerCommand } from "../../shared/helper"
+import { deletePoolConnectionConfig, resetPoolConnectionConfigs, showQuickPickConnectionConfigs } from "../../shared/connection-config"
+import { registerCommand, showMessage } from "../../shared/helper"
 import { getConnectionClientModule, getConnectionClientModules } from "../../shared/module"
 import { Module, PoolConnectionConfig } from "../../shared/types"
-import { window } from "vscode"
+import { commands, window } from "vscode"
 import { openEditConnectionWebview } from "./edit-connection/webview-backend"
 import { openTableWebview } from "./table/webview-backend"
 import { openHelpWebview } from "./help/webview-backend"
@@ -37,6 +37,24 @@ export const webviewsModule: Module = {
                 const module = getConnectionClientModule(databaseModuleName)
                 openEditConnectionWebview(module.getDefaultPoolConnectionConfig())
             }
+        })
+
+        registerCommand('SmileDB.deleteConnection', async (treeItem) => {
+            if (treeItem) {
+                deletePoolConnectionConfig(treeItem.connectionConfig)
+            } else {
+                const connectionConfig = await showQuickPickConnectionConfigs()
+
+                if (connectionConfig) {
+                    deletePoolConnectionConfig(connectionConfig)
+                }
+            }
+            commands.executeCommand('SmileDB.refreshTreeConnections')
+            showMessage('Connection deleted')
+        })
+        
+        registerCommand('SmileDB.resetConnectionStorage', () => {
+            resetPoolConnectionConfigs()
         })
 
         registerCommand('SmileDB.openTable', (

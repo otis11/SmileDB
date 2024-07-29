@@ -13,7 +13,6 @@ import { logInfo } from './shared/logger'
 import { setExtensionContext } from './shared/extension-context'
 import { ExtensionStorage, setExtensionStorage } from './shared/extension-storage'
 import { treeViewModule } from './modules/treeview/module'
-import { connectionsModule } from './modules/connections/module'
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -25,7 +24,6 @@ export function activate(context: vscode.ExtensionContext) {
     // modules
     installModule(webviewsModule)
     installModule(treeViewModule)
-    installModule(connectionsModule)
 
     // connection client modules
     installConnectionClientModule(mysqlModule)
