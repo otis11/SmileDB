@@ -22,6 +22,7 @@ fs.mkdirSync('./esbuild-meta', { recursive: true });
             './src/modules/webviews/code/index.ts',
             './src/modules/webviews/help/index.ts',
             './src/modules/webviews/active-connections/index.ts',
+            './src/modules/webviews/search/index.ts',
         ],
         minify: args.includes(FLAGS.minify),
         outdir: './dist/webviews',

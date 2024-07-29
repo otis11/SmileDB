@@ -7,12 +7,17 @@ import { openEditConnectionWebview } from "./edit-connection/webview-backend"
 import { openTableWebview } from "./table/webview-backend"
 import { openHelpWebview } from "./help/webview-backend"
 import { openCodeWebview } from "./code/webview-backend"
+import { openSearchWebview } from "./search/webview-backend"
 import { openActiveConnectionsWebview } from "./active-connections/webview-backend"
 import { getPoolConnection } from "../../shared/database-connections"
 
 export const webviewsModule: Module = {
     name: 'Webviews',
     install() {
+        registerCommand('SmileDB.openSearch', () => {
+            openSearchWebview()
+        })
+
         registerCommand('SmileDB.editConnection', async (treeItem) => {
             if (treeItem) {
                 openEditConnectionWebview(treeItem.connectionConfig)

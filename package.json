@@ -50,12 +50,17 @@
                 {
                     "command": "SmileDB.newConnection",
                     "when": "view == SmileDB",
-                    "group": "navigation@3"
+                    "group": "navigation@4"
                 },
                 {
                     "command": "SmileDB.help",
                     "when": "view == SmileDB",
                     "group": "navigation@2"
+                },
+                {
+                    "command": "SmileDB.openSearch",
+                    "when": "view == SmileDB",
+                    "group": "navigation@3"
                 }
             ],
             "view/item/context": [
@@ -166,6 +171,12 @@
                 "command": "SmileDB.copyTreeItemDescription",
                 "category": "SmileDB",
                 "title": "Copy Description"
+            },
+            {
+                "command": "SmileDB.openSearch",
+                "title": "Search",
+                "category": "SmileDB",
+                "icon": "$(search)"
             }
         ],
         "configuration": {
